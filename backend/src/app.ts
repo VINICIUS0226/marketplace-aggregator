@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
+import productRoutes from "./modules/products/routes/productRoutes";
 
 const app = express();
 
@@ -16,5 +17,7 @@ app.get("/health", (_, res) => {
     status: "ok"
   });
 });
+
+app.use("/products", productRoutes);
 
 export default app;
