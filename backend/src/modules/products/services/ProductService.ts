@@ -1,4 +1,5 @@
 import { ProductRepository } from "../repositories/ProductRepository";
+import { AppError } from "../../../shared/errors/AppError";
 
 interface Filters {
   category?: string;
@@ -19,30 +20,23 @@ export class ProductService {
 
     if (filters.category) {
       result = result.filter(
-        product =>
-          product.category.toLowerCase() ===
-          filters.category?.toLowerCase()
+        (product) =>
+          product.category.toLowerCase() === filters.category?.toLowerCase(),
       );
     }
 
     if (filters.search) {
-      result = result.filter(product =>
-        product.title
-          .toLowerCase()
-          .includes(filters.search!.toLowerCase())
+      result = result.filter((product) =>
+        product.title.toLowerCase().includes(filters.search!.toLowerCase()),
       );
     }
 
     if (filters.minPrice) {
-      result = result.filter(
-        product => product.price >= filters.minPrice!
-      );
+      result = result.filter((product) => product.price >= filters.minPrice!);
     }
 
     if (filters.maxPrice) {
-      result = result.filter(
-        product => product.price <= filters.maxPrice!
-      );
+      result = result.filter((product) => product.price <= filters.maxPrice!);
     }
 
     const page = filters.page || 1;
@@ -58,13 +52,19 @@ export class ProductService {
       totalItems: result.length,
       totalPages: Math.ceil(result.length / limit),
       page,
-      limit
+      limit,
     };
   }
 
   async getProductById(id: number) {
     const products = await this.repository.getAllProducts();
 
-    return products.find(product => product.id === id);
+    const product = products.find((product) => product.id === id);
+
+    if (!product) {
+      throw new AppError("Product not found", 404);
+    }
+
+    return product;
   }
 }

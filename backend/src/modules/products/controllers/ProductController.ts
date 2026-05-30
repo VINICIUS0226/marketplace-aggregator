@@ -11,23 +11,21 @@ export class ProductController {
       minPrice: Number(request.query.minPrice),
       maxPrice: Number(request.query.maxPrice),
       page: Number(request.query.page),
-      limit: Number(request.query.limit)
+      limit: Number(request.query.limit),
     });
 
     return response.json(result);
   }
 
   async show(request: Request, response: Response) {
-    const id = Number(request.params.id);
+    try {
+      const id = Number(request.params.id);
 
-    const product = await service.getProductById(id);
+      const product = await service.getProductById(id);
 
-    if (!product) {
-      return response.status(404).json({
-        message: "Product not found"
-      });
+      return response.json(product);
+    } catch (error) {
+      throw error;
     }
-
-    return response.json(product);
   }
 }
