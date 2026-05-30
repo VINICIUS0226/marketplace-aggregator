@@ -36,23 +36,48 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProductRepository = void 0;
 const axios_1 = __importStar(require("axios"));
 const cache_1 = require("../../../shared/config/cache");
+/**
+ * URL base da API externa utilizada para obtenção dos produtos.
+ */
+const PRODUCTS_API_URL = "https://dummyjson.com/products?limit=100";
+/**
+ * Chave utilizada para armazenamento dos produtos em cache.
+ */
+const PRODUCTS_CACHE_KEY = "products";
+/**
+ * Repository responsável pela integração com a fonte externa de produtos.
+ *
+ * Atualmente utiliza a DummyJSON API como marketplace mockado.
+ */
 class ProductRepository {
+    /**
+     * Obtém todos os produtos da fonte externa.
+     *
+     * Fluxo:
+     * 1. Verifica se os produtos estão em cache.
+     * 2. Caso não estejam, realiza consulta na API externa.
+     * 3. Armazena o resultado em cache.
+     * 4. Retorna a lista de produtos.
+     *
+     * @returns Lista de produtos.
+     * @throws Error Caso ocorra falha na integração externa.
+     */
     async getAllProducts() {
+        const cachedProducts = cache_1.cache.get(PRODUCTS_CACHE_KEY);
+        if (cachedProducts) {
+            return cachedProducts;
+        }
         try {
-            const cachedProducts = cache_1.cache.get("products");
-            if (cachedProducts) {
-                return cachedProducts;
-            }
-            const response = await axios_1.default.get("https://dummyjson.com/products?limit=100", {
+            const response = await axios_1.default.get(PRODUCTS_API_URL, {
                 timeout: 5000,
             });
             const products = response.data.products;
-            cache_1.cache.set("products", products);
+            cache_1.cache.set(PRODUCTS_CACHE_KEY, products);
             return products;
         }
         catch (error) {
             if (error instanceof axios_1.AxiosError) {
-                throw new Error("Failed to fetch external products source");
+                throw new Error("Failed to retrieve products from external provider.");
             }
             throw error;
         }
