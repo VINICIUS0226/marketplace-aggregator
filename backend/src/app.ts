@@ -4,6 +4,8 @@ import helmet from "helmet";
 import morgan from "morgan";
 import productRoutes from "./modules/products/routes/productRoutes";
 import { errorHandler } from "./shared/middlewares/errorHandler";
+import swaggerUi from "swagger-ui-express";
+import { swaggerSpec } from "./shared/config/swagger";
 
 const app = express();
 
@@ -20,6 +22,7 @@ app.get("/health", (_, res) => {
 });
 
 app.use("/products", productRoutes);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use(errorHandler);
 
