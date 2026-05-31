@@ -7,6 +7,7 @@ import {
 import { Products } from "../pages/Products";
 import { ProductDetail } from "../pages/ProductDetail";
 import { Compare } from "../pages/Compare";
+import { CompareButton } from "../components/CompareButton";
 
 export function AppRoutes() {
   return (
@@ -27,6 +28,8 @@ export function AppRoutes() {
           element={<Compare />}
         />
       </Routes>
+
+      <CompareButton />
     </BrowserRouter>
   );
 }
