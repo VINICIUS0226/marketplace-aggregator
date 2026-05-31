@@ -88,4 +88,17 @@ export class ProductController {
 
     return response.status(200).json(products);
   }
+
+  /**
+   * Retorna a lista de categorias disponíveis.
+   */
+  public async categories(
+    request: Request,
+    response: Response,
+  ): Promise<Response> {
+    const categories =
+      await this.productService.getCategories();
+
+    return response.status(200).json(categories);
+  }
 }

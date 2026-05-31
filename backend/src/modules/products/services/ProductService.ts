@@ -175,4 +175,19 @@ export class ProductService {
       ids.includes(product.id),
     );
   }
+
+  /**
+   * Retorna todas as categorias disponíveis
+   * a partir da lista de produtos.
+   */
+  public async getCategories(): Promise<string[]> {
+    const products =
+      await this.productRepository.getAllProducts();
+
+    return [
+      ...new Set(
+        products.map((product) => product.category),
+      ),
+    ];
+  }
 }

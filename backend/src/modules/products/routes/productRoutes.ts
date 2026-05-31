@@ -102,6 +102,22 @@ productsRouter.post(
 
 /**
  * @swagger
+ * /products/categories:
+ *   get:
+ *     summary: Lista categorias
+ *     description: Retorna a lista de categorias disponíveis.
+ *     tags: [Products]
+ *     responses:
+ *       200:
+ *         description: Lista de categorias retornada com sucesso.
+ */
+productsRouter.get(
+  "/categories",
+  asyncHandler(productController.categories.bind(productController)),
+);
+
+/**
+ * @swagger
  * /products/{id}:
  *   get:
  *     summary: Obtém um produto por ID

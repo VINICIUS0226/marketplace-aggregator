@@ -2,11 +2,13 @@ import {
   Card,
   CardMedia,
   CardContent,
+  CardActions,
+  CardActionArea,
   Typography,
   Button,
   Chip,
   Checkbox,
-  Stack,
+  Box,
 } from "@mui/material";
 
 import { Link } from "react-router-dom";
@@ -22,19 +24,61 @@ export function ProductCard({ product }: Props) {
   const checked = selectedProducts.some((p) => p.id === product.id);
 
   return (
-    <Card>
-      <CardMedia component="img" height="220" image={product.thumbnail} />
+    <Card
+      sx={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        boxShadow: 3,
+        transition: "transform 0.15s ease-in-out",
+        '&:hover': { transform: "translateY(-6px)" },
+      }}
+    >
+      <CardActionArea
+        component={Link}
+        to={`/products/${product.id}`}
+        sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, alignItems: 'stretch' }}
+      >
+        <CardMedia
+          component="img"
+          height="220"
+          image={product.thumbnail}
+          alt={product.title}
+          sx={{ objectFit: 'cover' }}
+        />
 
-      <CardContent>
-        <Typography variant="h6" gutterBottom>
-          {product.title}
-        </Typography>
+        <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <Box>
+            <Typography variant="h6" gutterBottom sx={{ fontWeight: 700 }}>
+              {product.title}
+            </Typography>
 
-        <Chip label={product.category} size="small" />
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+              }}
+            >
+              {product.description || ""}
+            </Typography>
+          </Box>
 
-        <Typography sx={{ mt: 2 }}>R$ {product.price}</Typography>
+          <Box sx={{ mt: 2, display: "flex", gap: 1, alignItems: "center" }}>
+            <Chip label={product.category} size="small" />
+            <Typography variant="h6" color="primary" sx={{ ml: "auto", fontWeight: 700 }}>
+              R$ {product.price}
+            </Typography>
+          </Box>
+        </CardContent>
+      </CardActionArea>
 
-        <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
+      <CardActions sx={{ px: 2, pb: 2, pt: 0 }}>
+        <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', gap: 1 }}>
           <Checkbox
             checked={checked}
             onChange={(event) => {
@@ -51,11 +95,12 @@ export function ProductCard({ product }: Props) {
             to={`/products/${product.id}`}
             variant="contained"
             fullWidth
+            size="small"
           >
             Ver Detalhes
           </Button>
-        </Stack>
-      </CardContent>
+        </Box>
+      </CardActions>
     </Card>
   );
 }

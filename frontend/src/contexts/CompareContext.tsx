@@ -19,6 +19,7 @@ interface CompareContextData {
   selectedProducts: Product[];
   addProduct: (product: Product) => void;
   removeProduct: (id: number) => void;
+  clearProducts: () => void;
 }
 
 const CompareContext =
@@ -52,12 +53,17 @@ export function CompareProvider({
     );
   }
 
+  function clearProducts() {
+    setSelectedProducts([]);
+  }
+
   return (
     <CompareContext.Provider
       value={{
         selectedProducts,
         addProduct,
-        removeProduct
+        removeProduct,
+        clearProducts,
       }}
     >
       {children}

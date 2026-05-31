@@ -5,6 +5,8 @@ interface Params {
   page?: number;
   search?: string;
   category?: string;
+  minPrice?: number;
+  maxPrice?: number;
 }
 
 export function useProducts(params: Params) {

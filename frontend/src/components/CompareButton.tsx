@@ -1,49 +1,71 @@
 import {
-  Fab,
-  Badge
+  Box,
+  Button,
+  Paper,
+  Typography,
 } from "@mui/material";
 
-import CompareIcon
-from "@mui/icons-material/Compare";
-
-import { useNavigate } from "react-router-dom";
-
-import { useCompare }
-from "../contexts/CompareContext";
+import CompareIcon from "@mui/icons-material/Compare";
+import CloseIcon from "@mui/icons-material/Close";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useCompare } from "../contexts/CompareContext";
 
 export function CompareButton() {
-
-  const {
-    selectedProducts
-  } = useCompare();
-
+  const { selectedProducts, clearProducts } = useCompare();
   const navigate = useNavigate();
+  const location = useLocation();
+  const isComparePage = location.pathname === "/compare";
 
-  if (
-    selectedProducts.length < 2
-  ) {
+  if (!isComparePage && selectedProducts.length < 2) {
     return null;
   }
 
+  const handleClick = () => {
+    if (isComparePage) {
+      clearProducts();
+      navigate("/");
+      return;
+    }
+
+    navigate("/compare");
+  };
+
   return (
-    <Badge
-      badgeContent={
-        selectedProducts.length
-      }
-      color="primary"
+    <Paper
+      elevation={8}
       sx={{
         position: "fixed",
-        bottom: 30,
-        right: 30
+        bottom: 24,
+        right: 24,
+        zIndex: 1400,
+        borderRadius: 4,
+        overflow: "hidden",
+        bgcolor: "primary.main",
       }}
     >
-      <Fab
-        color="primary"
-        onClick={() => navigate("/compare")}
-        aria-label="Comparar produtos"
+      <Button
+        onClick={handleClick}
+        sx={{
+          color: "common.white",
+          textTransform: "none",
+          px: 3,
+          py: 1.25,
+          minWidth: 240,
+          justifyContent: "flex-start",
+        }}
       >
-        <CompareIcon />
-      </Fab>
-    </Badge>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+          {isComparePage ? <CloseIcon sx={{ fontSize: 22 }} /> : <CompareIcon sx={{ fontSize: 22 }} />}
+          <Box sx={{ textAlign: "left" }}>
+            <Typography variant="button" sx={{ color: "common.white", fontWeight: 700, display: 'block' }}>
+              {isComparePage ? "Fechar comparação" : "Abrir comparação"}
+            </Typography>
+            <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.92)", display: 'block' }}>
+              {selectedProducts.length} produtos selecionados
+            </Typography>
+          </Box>
+        </Box>
+      </Button>
+    </Paper>
   );
 }
