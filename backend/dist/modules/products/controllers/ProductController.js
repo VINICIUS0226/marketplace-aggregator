@@ -70,5 +70,12 @@ class ProductController {
         const products = await this.productService.compareProducts(ids);
         return response.status(200).json(products);
     }
+    /**
+     * Retorna a lista de categorias disponíveis.
+     */
+    async categories(request, response) {
+        const categories = await this.productService.getCategories();
+        return response.status(200).json(categories);
+    }
 }
 exports.ProductController = ProductController;

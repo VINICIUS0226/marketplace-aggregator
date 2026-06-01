@@ -7,6 +7,7 @@ import {
 import { Products } from "../pages/Products";
 import { ProductDetail } from "../pages/ProductDetail";
 import { Compare } from "../pages/Compare";
+import { NotFound } from "../pages/NotFound";
 import { CompareButton } from "../components/CompareButton";
 
 export function AppRoutes() {
@@ -26,6 +27,10 @@ export function AppRoutes() {
         <Route
           path="/compare"
           element={<Compare />}
+        />
+        <Route
+          path="*"
+          element={<NotFound />}
         />
       </Routes>
 

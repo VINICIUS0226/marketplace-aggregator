@@ -42,7 +42,7 @@ export class ProductRepository {
 
     try {
       const response = await axios.get(PRODUCTS_API_URL, {
-        timeout: 5000,
+        timeout: 15000,
       });
 
       const products: Product[] = response.data.products;
@@ -51,13 +51,15 @@ export class ProductRepository {
 
       return products;
     } catch (error) {
-      if (error instanceof AxiosError) {
-        throw new Error(
-          "Failed to retrieve products from external provider."
-        );
-      }
-
-      throw error;
+      const errorMessage = error instanceof AxiosError 
+        ? `${error.code}: ${error.message}` 
+        : String(error);
+      
+      console.error(`[ProductRepository] Failed to fetch products: ${errorMessage}`);
+      
+      throw new Error(
+        "Failed to retrieve products from external provider."
+      );
     }
   }
 }

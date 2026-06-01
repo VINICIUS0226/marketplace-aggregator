@@ -3,7 +3,7 @@ import {
   Typography,
   Grid,
   TextField,
-  CircularProgress,
+  Skeleton,
   Pagination,
   Box,
   FormControl,
@@ -154,34 +154,49 @@ export function Products() {
         </Box>
       </Paper>
 
-      {isLoading && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
-          <CircularProgress />
+      {isLoading ? (
+        <Grid container spacing={3}>
+          {[...Array(8)].map((_, index) => (
+            <Grid size={{ xs: 12, sm: 6, md: 3 }} key={index}>
+              <Paper sx={{ p: 2, borderRadius: 3, boxShadow: 2 }}>
+                <Skeleton variant="rectangular" height={180} sx={{ borderRadius: 2 }} />
+                <Skeleton sx={{ mt: 2 }} width="80%" />
+                <Skeleton sx={{ mt: 1 }} width="60%" />
+                <Skeleton sx={{ mt: 2 }} width="40%" />
+              </Paper>
+            </Grid>
+          ))}
+        </Grid>
+      ) : data?.data.length === 0 ? (
+        <Box sx={{ mt: 4, textAlign: 'center' }}>
+          <Typography variant="h6" color="text.secondary">
+            Nenhum produto encontrado.
+          </Typography>
         </Box>
-      )}
-
-      <Grid container spacing={3}>
-        {data?.data?.map((product: any) => (
-          <Grid size={{ xs: 12, sm: 6, md: 3 }} key={product.id}>
-            <ProductCard product={product} />
+      ) : (
+        <>
+          <Grid container spacing={3}>
+            {data?.data?.map((product: any) => (
+              <Grid size={{ xs: 12, sm: 6, md: 3 }} key={product.id}>
+                <ProductCard product={product} />
+              </Grid>
+            ))}
           </Grid>
-        ))}
-      </Grid>
 
-      {data && (
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            mt: 4,
-          }}
-        >
-          <Pagination
-            page={page}
-            count={data.totalPages}
-            onChange={(_, value) => setPage(value)}
-          />
-        </Box>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              mt: 4,
+            }}
+          >
+            <Pagination
+              page={page}
+              count={data.totalPages}
+              onChange={(_, value) => setPage(value)}
+            />
+          </Box>
+        </>
       )}
     </Container>
   );

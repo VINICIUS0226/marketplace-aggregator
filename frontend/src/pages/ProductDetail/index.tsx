@@ -26,7 +26,7 @@ export function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const { data, isLoading } = useProduct(id!);
+  const { data, isLoading, error } = useProduct(id!);
   const { selectedProducts, addProduct, removeProduct } = useCompare();
   const [openImage, setOpenImage] = useState(false);
 
@@ -37,6 +37,26 @@ export function ProductDetail() {
         <Skeleton variant="text" width="60%" />
         <Skeleton variant="text" width="40%" />
         <Skeleton variant="text" width="80%" />
+      </Container>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <Container sx={{ mt: 4 }}>
+        <Button
+          startIcon={<ArrowBackIcon />}
+          onClick={() => navigate(-1)}
+          variant="text"
+          sx={{ mb: 2 }}
+        >
+          Voltar
+        </Button>
+        <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 3 }}>
+          <Typography color="error">
+            Erro ao carregar o produto. Tente novamente.
+          </Typography>
+        </Paper>
       </Container>
     );
   }

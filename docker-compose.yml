@@ -1,0 +1,25 @@
+services:
+
+  backend:
+    build:
+      context: ./backend
+    container_name: marketplace-backend
+
+    ports:
+      - "3000:3000"
+
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+
+    container_name: marketplace-frontend
+
+    ports:
+      - "5173:5173"
+
+    depends_on:
+      - backend
+
+    restart: unless-stopped

@@ -90,5 +90,15 @@ class ProductService {
         const products = await this.productRepository.getAllProducts();
         return products.filter((product) => ids.includes(product.id));
     }
+    /**
+     * Retorna todas as categorias disponíveis
+     * a partir da lista de produtos.
+     */
+    async getCategories() {
+        const products = await this.productRepository.getAllProducts();
+        return [
+            ...new Set(products.map((product) => product.category)),
+        ];
+    }
 }
 exports.ProductService = ProductService;

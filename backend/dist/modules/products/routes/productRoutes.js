@@ -62,6 +62,18 @@ const productController = new ProductController_1.ProductController();
 productsRouter.get("/", (0, asyncHandler_1.asyncHandler)(productController.list.bind(productController)));
 /**
  * @swagger
+ * /products/categories:
+ *   get:
+ *     summary: Lista categorias
+ *     description: Retorna a lista de categorias disponíveis.
+ *     tags: [Products]
+ *     responses:
+ *       200:
+ *         description: Lista de categorias retornada com sucesso.
+ */
+productsRouter.get("/categories", (0, asyncHandler_1.asyncHandler)(productController.categories.bind(productController)));
+/**
+ * @swagger
  * /products/compare:
  *   post:
  *     summary: Compara produtos
