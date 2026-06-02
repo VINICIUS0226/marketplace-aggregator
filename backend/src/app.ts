@@ -1,4 +1,4 @@
-import dotenv from "dotenv";
+import "dotenv/config";
 import express, {
   Application,
   Request,
@@ -23,8 +23,6 @@ import {
 import { logger } from "./shared/utils/logger";
 import { observabilityMiddleware } from "./shared/middlewares/observability";
 import { createErrorResponse } from "./shared/utils/errorResponse";
-
-dotenv.config();
 
 /**
  * App Express isolado do listener HTTP.

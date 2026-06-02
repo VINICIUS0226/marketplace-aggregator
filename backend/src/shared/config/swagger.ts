@@ -53,6 +53,17 @@ const options: swaggerJsdoc.Options = {
       schemas: {
         Product: {
           type: "object",
+          required: [
+            "id",
+            "title",
+            "description",
+            "category",
+            "price",
+            "rating",
+            "stock",
+            "thumbnail",
+            "images",
+          ],
           properties: {
             id: { type: "integer", example: 1 },
             title: { type: "string", example: "Essence Mascara Lash Princess" },
@@ -74,6 +85,7 @@ const options: swaggerJsdoc.Options = {
               type: "array",
               items: {
                 type: "object",
+                required: ["date", "price"],
                 properties: {
                   date: { type: "string", example: "2026-05-28" },
                   price: { type: "number", example: 99 },
@@ -85,6 +97,7 @@ const options: swaggerJsdoc.Options = {
 
         PaginatedProducts: {
           type: "object",
+          required: ["data", "totalItems", "totalPages", "page", "limit"],
           properties: {
             data: {
               type: "array",
@@ -101,6 +114,7 @@ const options: swaggerJsdoc.Options = {
 
         LoginResponse: {
           type: "object",
+          required: ["token", "expiresIn"],
           properties: {
             token: {
               type: "string",
@@ -115,6 +129,7 @@ const options: swaggerJsdoc.Options = {
 
         RefreshCacheResponse: {
           type: "object",
+          required: ["message", "totalItems"],
           properties: {
             message: {
               type: "string",
@@ -129,6 +144,13 @@ const options: swaggerJsdoc.Options = {
 
         MetricsSnapshot: {
           type: "object",
+          required: [
+            "externalProviderRequests",
+            "externalProviderSuccesses",
+            "externalProviderFailures",
+            "externalProviderRetries",
+            "staleCacheFallbacks",
+          ],
           properties: {
             externalProviderRequests: { type: "integer", example: 3 },
             externalProviderSuccesses: { type: "integer", example: 1 },
@@ -140,6 +162,7 @@ const options: swaggerJsdoc.Options = {
 
         HealthResponse: {
           type: "object",
+          required: ["status", "timestamp", "uptime"],
           properties: {
             status: { type: "string", example: "ok" },
             timestamp: {
@@ -153,6 +176,7 @@ const options: swaggerJsdoc.Options = {
 
         ValidationIssue: {
           type: "object",
+          required: ["path", "message"],
           properties: {
             path: {
               type: "string",

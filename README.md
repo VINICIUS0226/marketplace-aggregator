@@ -235,6 +235,18 @@ URLs locais:
 
 ## Variáveis de Ambiente
 
+O repositório inclui arquivos `.env.example`. Para execução local, copie o
+exemplo do serviço desejado para `.env` no mesmo diretório antes de customizar
+os valores:
+
+```bash
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+```
+
+Para a composição de produção, `.env.example` na raiz documenta o segredo
+obrigatório esperado pelo Docker Compose.
+
 Backend:
 
 ```env
@@ -418,6 +430,7 @@ Antes da entrega, foram executados localmente:
 cd backend && npm test
 cd backend && npm run build
 cd frontend && npm test
+cd frontend && npm run lint
 cd frontend && npm run build
 cd frontend && npm run test:e2e
 docker compose up -d --build
@@ -426,7 +439,7 @@ docker compose up -d --build
 Resultados observados:
 
 - `39/39` testes automatizados do backend aprovados.
-- `24/24` testes unitários e de componente do frontend aprovados.
+- `27/27` testes unitários e de componente do frontend aprovados.
 - `7/7` testes E2E aprovados: listagem, detalhe, comparação desktop e mobile, autenticação, fallback resiliente e geração das evidências visuais.
 - Build do backend aprovado.
 - Build do frontend aprovado.
@@ -522,7 +535,7 @@ Esses pontos aumentariam a complexidade sem serem necessários para cumprir o co
 - O fallback retorna erro quando a DummyJSON está indisponível e a instância ainda não possui snapshot válido.
 - As credenciais de demonstração são fixas e existem apenas para evidenciar proteção de rota.
 - O histórico de preços não é persistido entre reinicializações.
-- A comparação é mantida no estado do browser e não sobrevive a refresh da página.
+- A comparação é mantida em `sessionStorage`: sobrevive a refresh, mas é limpa ao encerrar a sessão da aba.
 - As métricas são locais ao processo e os traces HTTP são registrados nos logs, sem exportador OpenTelemetry.
 
 ## Próximos Passos
