@@ -16,6 +16,9 @@ import {
 } from "@mui/material";
 
 import ClearAllIcon from "@mui/icons-material/ClearAll";
+import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
+import SearchIcon from "@mui/icons-material/Search";
+import InputAdornment from "@mui/material/InputAdornment";
 import { useState } from "react";
 
 import { useProducts } from "../../hooks/useProducts";
@@ -39,6 +42,11 @@ export function Products() {
   });
 
   const { data: categories } = useCategories();
+  const hasActiveFilters =
+    Boolean(search) ||
+    Boolean(category) ||
+    minPrice !== "" ||
+    maxPrice !== "";
 
   /**
    * Ao limpar filtros, a paginação volta para o início para evitar consultar
@@ -58,34 +66,23 @@ export function Products() {
         Marketplace Aggregator
       </Typography>
 
-      <Paper sx={{ p: 3, mb: 4, borderRadius: 3, boxShadow: 2, border: "1px solid", borderColor: "divider" }}>
-        <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: 2, justifyContent: "space-between", alignItems: "center", mb: 3 }}>
-          <Box>
-            <Typography variant="h6">Filtros</Typography>
-            <Typography variant="body2" color="text.secondary">
-              Refine sua busca por categoria e faixa de preço.
-            </Typography>
-          </Box>
-
-          <Button
-            variant="outlined"
-            startIcon={<ClearAllIcon />}
-            onClick={clearFilters}
-            sx={{ whiteSpace: "nowrap" }}
-          >
-            Limpar filtros
-          </Button>
+      <Paper sx={{ p: { xs: 2, md: 2.5 }, mb: 4, borderRadius: 2, boxShadow: 1, border: "1px solid", borderColor: "divider" }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
+          <FilterAltOutlinedIcon color="primary" fontSize="small" />
+          <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+            Filtros
+          </Typography>
         </Box>
 
         <Box
           sx={{
             display: "grid",
-            gap: 16,
-            alignItems: "end",
+            gap: 1.5,
+            alignItems: "center",
             gridTemplateColumns: {
               xs: "1fr",
-              sm: "1.7fr 1fr",
-              md: "1.7fr 1fr 1fr 1fr",
+              sm: "minmax(0, 1.5fr) minmax(180px, 1fr)",
+              md: "minmax(260px, 1.7fr) minmax(180px, 1fr) minmax(130px, .7fr) minmax(130px, .7fr)",
             },
           }}
         >
@@ -94,6 +91,15 @@ export function Products() {
             label="Buscar produto"
             placeholder="Ex: smartphone, geladeira, tênis"
             value={search}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon fontSize="small" color="action" />
+                  </InputAdornment>
+                ),
+              },
+            }}
             onChange={(event) => {
               setSearch(event.target.value);
               setPage(1);
@@ -150,12 +156,37 @@ export function Products() {
           />
         </Box>
 
-        <Box sx={{ mt: 3, display: "flex", flexWrap: "wrap", gap: 1, alignItems: "center" }}>
-          {search && <Chip label={`Busca: ${search}`} onDelete={() => setSearch("")} />}
-          {category && <Chip label={`Categoria: ${category}`} onDelete={() => setCategory("")} />}
-          {minPrice !== "" && <Chip label={`Mínimo: R$${minPrice}`} onDelete={() => setMinPrice("")} />}
-          {maxPrice !== "" && <Chip label={`Máximo: R$${maxPrice}`} onDelete={() => setMaxPrice("")} />}
-        </Box>
+        {hasActiveFilters && (
+          <Box
+            sx={{
+              mt: 2,
+              pt: 2,
+              borderTop: "1px solid",
+              borderColor: "divider",
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 1,
+              alignItems: "center",
+            }}
+          >
+            <Typography variant="caption" color="text.secondary" sx={{ mr: 0.5 }}>
+              Ativos:
+            </Typography>
+            {search && <Chip size="medium" label={`Busca: ${search}`} onDelete={() => setSearch("")} />}
+            {category && <Chip size="small" label={`Categoria: ${category}`} onDelete={() => setCategory("")} />}
+            {minPrice !== "" && <Chip size="small" label={`Mínimo: R$ ${minPrice}`} onDelete={() => setMinPrice("")} />}
+            {maxPrice !== "" && <Chip size="small" label={`Máximo: R$ ${maxPrice}`} onDelete={() => setMaxPrice("")} />}
+
+            <Button
+              size="small"
+              startIcon={<ClearAllIcon />}
+              onClick={clearFilters}
+              sx={{ ml: { sm: "auto" }, whiteSpace: "nowrap" }}
+            >
+              Limpar
+            </Button>
+          </Box>
+        )}
       </Paper>
 
       {isLoading ? (
