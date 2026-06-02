@@ -9,6 +9,8 @@ import {
   Paper,
   Button,
   Box,
+  Alert,
+  CircularProgress,
 } from "@mui/material";
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -16,10 +18,18 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate } from "react-router-dom";
 import { useCompare } from "../../contexts/compareStore";
 import { formatCurrency } from "../../utils/currency";
+import { useComparedProducts } from "../../hooks/useComparedProducts";
 
 export function Compare() {
   const { selectedProducts } = useCompare();
   const navigate = useNavigate();
+  const selectedProductIds = selectedProducts.map(({ id }) => id);
+  const {
+    data: comparedProducts = [],
+    isLoading,
+    isError,
+    refetch,
+  } = useComparedProducts(selectedProductIds);
 
   return (
     <Container sx={{ mt: 4 }}>
@@ -43,6 +53,21 @@ export function Compare() {
         <Typography sx={{ mt: 2 }}>
           Select at least two products to view the comparison.
         </Typography>
+      ) : isLoading ? (
+        <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+          <CircularProgress />
+        </Box>
+      ) : isError ? (
+        <Alert
+          severity="error"
+          action={
+            <Button color="inherit" size="small" onClick={() => refetch()}>
+              Try again
+            </Button>
+          }
+        >
+          Unable to load the comparison.
+        </Alert>
       ) : (
         <Paper sx={{ p: 2, borderRadius: 2, border: "1px solid", borderColor: "divider" }}>
           {/* Tabela favorece leitura lado a lado, que é o objetivo central da comparação. */}
@@ -54,7 +79,7 @@ export function Compare() {
                   Attribute
                 </TableCell>
 
-                {selectedProducts.map((product) => (
+                {comparedProducts.map((product) => (
                   <TableCell
                     key={product.id}
                     sx={{
@@ -79,7 +104,7 @@ export function Compare() {
               <TableRow sx={{ bgcolor: "background.default" }}>
                 <TableCell sx={{ fontWeight: 700, py: 2 }}>Image</TableCell>
 
-                {selectedProducts.map((product) => (
+                {comparedProducts.map((product) => (
                   <TableCell key={product.id} sx={{ textAlign: "center", py: 2 }}>
                     <Box sx={{ display: "flex", justifyContent: "center" }}>
                       <img
@@ -95,7 +120,7 @@ export function Compare() {
               <TableRow>
                 <TableCell sx={{ fontWeight: 700, py: 2 }}>Price</TableCell>
 
-                {selectedProducts.map((product) => (
+                {comparedProducts.map((product) => (
                   <TableCell key={product.id} sx={{ textAlign: "center", py: 2 }}>
                     <Typography variant="body1" sx={{ fontWeight: 700 }}>
                       {formatCurrency(product.price)}
@@ -107,7 +132,7 @@ export function Compare() {
               <TableRow sx={{ bgcolor: "background.default" }}>
                 <TableCell sx={{ fontWeight: 700, py: 2 }}>Category</TableCell>
 
-                {selectedProducts.map((product) => (
+                {comparedProducts.map((product) => (
                   <TableCell key={product.id} sx={{ textAlign: "center", py: 2 }}>
                     <Typography variant="body2" color="text.secondary">
                       {product.category}
@@ -119,7 +144,7 @@ export function Compare() {
               <TableRow>
                 <TableCell sx={{ fontWeight: 700, py: 2 }}>Rating</TableCell>
 
-                {selectedProducts.map((product) => (
+                {comparedProducts.map((product) => (
                   <TableCell key={product.id} sx={{ textAlign: "center", py: 2 }}>
                     {product.rating}
                   </TableCell>

@@ -1,11 +1,15 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { Compare } from ".";
 import { CompareContext } from "../../contexts/compareStore";
 import type { Product } from "../../types/Product";
+import { useComparedProducts } from "../../hooks/useComparedProducts";
+
+vi.mock("../../hooks/useComparedProducts");
 
 const products: Product[] = [
   {
@@ -50,6 +54,15 @@ function renderCompare(selectedProducts: Product[]) {
 }
 
 describe("Compare page", () => {
+  beforeEach(() => {
+    vi.mocked(useComparedProducts).mockReturnValue({
+      data: products,
+      isLoading: false,
+      isError: false,
+      refetch: vi.fn(),
+    } as unknown as ReturnType<typeof useComparedProducts>);
+  });
+
   it("asks for at least two products", () => {
     renderCompare([products[0]]);
 
@@ -65,5 +78,37 @@ describe("Compare page", () => {
     expect(screen.getByText("Notebook Air")).toBeInTheDocument();
     expect(screen.getByText("R$ 4.999,00")).toBeInTheDocument();
     expect(screen.getByText("R$ 3.999,00")).toBeInTheDocument();
+  });
+
+  it("shows progress while loading the comparison", () => {
+    vi.mocked(useComparedProducts).mockReturnValue({
+      data: undefined,
+      isLoading: true,
+      isError: false,
+      refetch: vi.fn(),
+    } as unknown as ReturnType<typeof useComparedProducts>);
+
+    renderCompare(products);
+
+    expect(screen.getByRole("progressbar")).toBeInTheDocument();
+  });
+
+  it("allows retrying a failed comparison", async () => {
+    const refetch = vi.fn();
+
+    vi.mocked(useComparedProducts).mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      refetch,
+    } as unknown as ReturnType<typeof useComparedProducts>);
+
+    renderCompare(products);
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /Try again/i }),
+    );
+
+    expect(refetch).toHaveBeenCalledTimes(1);
   });
 });
