@@ -59,7 +59,19 @@ describe("Products page", () => {
 
     vi.mocked(useProducts).mockReturnValue({
       data: {
-        data: [],
+        data: [
+          {
+            id: 1,
+            title: "Notebook Pro",
+            description: "High performance notebook",
+            category: "notebooks",
+            price: 4999,
+            rating: 4.8,
+            stock: 7,
+            thumbnail: "notebook.png",
+            images: ["notebook.png"],
+          },
+        ],
         totalItems: 0,
         totalPages: 0,
         page: 1,
@@ -89,6 +101,85 @@ describe("Products page", () => {
       expect.objectContaining({
         search: "notebook",
         minPrice: 1000,
+      }),
+    );
+  });
+
+  it("clears active filters and returns to the first page", async () => {
+    const user = userEvent.setup();
+
+    vi.mocked(useProducts).mockReturnValue({
+      data: {
+        data: [],
+        totalItems: 0,
+        totalPages: 0,
+        page: 1,
+        limit: 10,
+      },
+      isLoading: false,
+      isError: false,
+      refetch: vi.fn(),
+    } as unknown as ReturnType<typeof useProducts>);
+
+    render(
+      <MemoryRouter>
+        <Products />
+      </MemoryRouter>,
+    );
+
+    await user.type(
+      screen.getByRole("textbox", { name: "Search products" }),
+      "notebook",
+    );
+    await user.click(screen.getByRole("button", { name: "Clear" }));
+
+    expect(useProducts).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        page: 1,
+        search: "",
+      }),
+    );
+  });
+
+  it("requests another page when pagination changes", async () => {
+    const user = userEvent.setup();
+
+    vi.mocked(useProducts).mockReturnValue({
+      data: {
+        data: [
+          {
+            id: 1,
+            title: "Notebook Pro",
+            description: "High performance notebook",
+            category: "notebooks",
+            price: 4999,
+            rating: 4.8,
+            stock: 7,
+            thumbnail: "notebook.png",
+            images: ["notebook.png"],
+          },
+        ],
+        totalItems: 30,
+        totalPages: 3,
+        page: 1,
+        limit: 10,
+      },
+      isLoading: false,
+      isError: false,
+      refetch: vi.fn(),
+    } as unknown as ReturnType<typeof useProducts>);
+
+    render(
+      <MemoryRouter>
+        <Products />
+      </MemoryRouter>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Go to page 2" }));
+
+    expect(useProducts).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        page: 2,
       }),
     );
   });

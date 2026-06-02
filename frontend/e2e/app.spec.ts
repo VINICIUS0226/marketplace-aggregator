@@ -38,6 +38,29 @@ test('should compare two selected products', async ({ page }) => {
   await expect(page.getByText('Stock')).toBeVisible();
 });
 
+test('should keep product comparison usable on mobile', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+
+  const checkboxes = page.getByRole('checkbox');
+  await expect(checkboxes.nth(1)).toBeVisible();
+
+  await checkboxes.nth(0).check();
+  await checkboxes.nth(1).check();
+  await page.getByRole('button', { name: /Open comparison/i }).click();
+
+  const scrollContainer = page.getByTestId('comparison-scroll-container');
+  await expect(scrollContainer).toBeVisible();
+  await expect(scrollContainer).toHaveCSS('overflow-x', 'auto');
+
+  const dimensions = await scrollContainer.evaluate((element) => ({
+    clientWidth: element.clientWidth,
+    scrollWidth: element.scrollWidth,
+  }));
+
+  expect(dimensions.scrollWidth).toBeGreaterThan(dimensions.clientWidth);
+});
+
 test('should protect cache refresh with JWT authentication', async ({ request }) => {
   const unauthorizedResponse = await request.post(
     'http://127.0.0.1:3000/products/refresh-cache',

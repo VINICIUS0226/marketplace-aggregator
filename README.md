@@ -174,16 +174,18 @@ docker compose down
 ### Docker em Produção
 
 O repositório também inclui uma composição simplificada de produção. Ela usa o
-build compilado do backend e serve o frontend estático com Nginx:
-
-```bash
-docker compose -f docker-compose.prod.yml up --build -d
-```
-
-Em um ambiente real, injete um segredo próprio:
+build compilado do backend, serve o frontend estático com Nginx e exige um
+segredo explícito, falhando cedo quando ele não é informado:
 
 ```bash
 AUTH_SECRET=um-segredo-forte docker compose -f docker-compose.prod.yml up --build -d
+```
+
+No PowerShell:
+
+```powershell
+$env:AUTH_SECRET="um-segredo-forte"
+docker compose -f docker-compose.prod.yml up --build -d
 ```
 
 O Nginx está configurado com fallback para `index.html`, permitindo acesso
@@ -406,8 +408,8 @@ docker compose up -d --build
 Resultados observados:
 
 - `35/35` testes automatizados do backend aprovados.
-- `15/15` testes unitários e de componente do frontend aprovados.
-- `6/6` testes E2E aprovados: listagem, detalhe, comparação, autenticação, fallback resiliente e geração das evidências visuais.
+- `20/20` testes unitários e de componente do frontend aprovados.
+- `7/7` testes E2E aprovados: listagem, detalhe, comparação desktop e mobile, autenticação, fallback resiliente e geração das evidências visuais.
 - Build do frontend aprovado.
 - Cobertura mínima protegida por thresholds no Jest e Vitest.
 - Backend saudável via `GET /health`.
@@ -481,7 +483,7 @@ Esses pontos aumentariam a complexidade sem serem necessários para cumprir o co
 - Persistir produtos e histórico de preços em PostgreSQL ou SQLite.
 - Adicionar Redis para cache distribuído.
 - Criar deploy público.
-- Exportar métricas para Prometheus e adicionar tracing distribuído.
+- Exportar métricas para Prometheus, adicionar correlation IDs e tracing distribuído.
 
 ## Evidências Visuais
 

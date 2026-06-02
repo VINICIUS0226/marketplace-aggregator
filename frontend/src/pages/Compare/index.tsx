@@ -46,7 +46,8 @@ export function Compare() {
       ) : (
         <Paper sx={{ p: 2, borderRadius: 2, border: "1px solid", borderColor: "divider" }}>
           {/* Tabela favorece leitura lado a lado, que é o objetivo central da comparação. */}
-          <Table sx={{ borderCollapse: "separate", minWidth: 720 }}>
+          <Box data-testid="comparison-scroll-container" sx={{ overflowX: "auto" }}>
+            <Table sx={{ borderCollapse: "separate", minWidth: 720 }}>
             <TableHead>
               <TableRow>
                 <TableCell sx={{ fontWeight: 700, borderBottom: "2px solid", borderColor: "divider", width: 180 }}>
@@ -135,7 +136,8 @@ export function Compare() {
                 ))}
               </TableRow>
             </TableBody>
-          </Table>
+            </Table>
+          </Box>
         </Paper>
       )}
     </Container>
