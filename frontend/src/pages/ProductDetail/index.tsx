@@ -22,6 +22,7 @@ import { useState } from "react";
 import { useProduct } from "../../hooks/useProduct";
 import { useCompare } from "../../contexts/compareStore";
 import { formatCurrency } from "../../utils/currency";
+import { formatDate } from "../../utils/date";
 
 export function ProductDetail() {
   const { id } = useParams();
@@ -153,7 +154,7 @@ export function ProductDetail() {
                 }}
               >
                 <Typography variant="caption" color="text.secondary">
-                  {item.date}
+                  {formatDate(item.date)}
                 </Typography>
                 <Typography variant="body1" sx={{ fontWeight: 700 }}>
                   {formatCurrency(item.price)}

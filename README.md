@@ -187,6 +187,18 @@ AUTH_SECRET=um-segredo-forte docker compose -f docker-compose.prod.yml up --buil
 O Nginx está configurado com fallback para `index.html`, permitindo acesso
 direto às rotas do React Router.
 
+Serviços da composição de produção:
+
+| Serviço | URL |
+| --- | --- |
+| Frontend | http://localhost |
+| Backend | http://localhost:3000 |
+| Swagger | http://localhost:3000/api-docs |
+
+A composição padrão publica o servidor Vite na porta `5173`. A composição de
+produção publica o Nginx na porta HTTP padrão `80`, por isso o frontend é
+acessado apenas por `http://localhost`, sem informar uma porta.
+
 ## Como Rodar Localmente
 
 Backend:
@@ -391,12 +403,12 @@ docker compose up -d --build
 Resultados observados:
 
 - `32/32` testes automatizados do backend aprovados.
-- `15/15` testes unitários e de componente do frontend aprovados.
+- `16/16` testes unitários e de componente do frontend aprovados.
 - `6/6` testes E2E aprovados: listagem, detalhe, comparação, autenticação, fallback resiliente e geração das evidências visuais.
 - Build do frontend aprovado.
 - Cobertura mínima protegida por thresholds no Jest e Vitest.
 - Backend saudável via `GET /health`.
-- Frontend acessível em `http://localhost:5173`.
+- Frontend acessível em `http://localhost:5173` com a composição padrão e em `http://localhost` com a composição de produção.
 - Pipeline do GitHub Actions aprovado em `master`.
 
 ## CI
