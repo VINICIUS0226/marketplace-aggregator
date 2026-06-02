@@ -5,7 +5,7 @@ WORKDIR /app
 COPY package*.json ./
 
 RUN apk add --no-cache curl \
-  && npm install
+  && npm ci
 
 COPY . .
 
