@@ -120,6 +120,19 @@ GET /products
 
 O repository aplica timeout de 15 segundos na integração externa e normaliza o payload recebido antes de disponibilizá-lo às outras camadas.
 
+## Clonar o Repositório
+
+```bash
+git clone https://github.com/VINICIUS0226/marketplace-aggregator.git
+cd marketplace-aggregator
+```
+
+Repositório público:
+
+```text
+https://github.com/VINICIUS0226/marketplace-aggregator
+```
+
 ## Como Rodar com Docker
 
 Pré-requisitos:
