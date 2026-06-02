@@ -5,6 +5,7 @@ import {
 } from "express";
 
 import { AppError } from "../errors/AppError";
+import { logger } from "../utils/logger";
 
 /**
  * Middleware global de erros.
@@ -25,12 +26,11 @@ export function errorHandler(
     });
   }
 
-  console.error(
-    `[${new Date().toISOString()}]`,
-    request.method,
-    request.originalUrl,
-    error,
-  );
+  logger.error("unhandled_request_error", {
+    method: request.method,
+    path: request.originalUrl,
+    message: error.message,
+  });
 
   return response.status(500).json({
     success: false,

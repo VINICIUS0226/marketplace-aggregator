@@ -2,6 +2,10 @@ import axios, { AxiosError } from "axios";
 
 import { Product } from "../types/Product";
 import { cache } from "../../../shared/config/cache";
+import {
+  incrementMetric,
+} from "../../../shared/config/metrics";
+import { logger } from "../../../shared/utils/logger";
 
 /**
  * URL da fonte externa escolhida para o case.
@@ -17,6 +21,12 @@ const PRODUCTS_API_URL =
  * Chave única do cache em memória.
  */
 const PRODUCTS_CACHE_KEY = "products";
+const MAX_PROVIDER_ATTEMPTS = 3;
+const RETRY_BASE_DELAY_MS = 100;
+
+function wait(milliseconds: number) {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
+}
 
 function isExternalProduct(product: unknown): product is Product {
   if (!product || typeof product !== "object") {
@@ -98,47 +108,63 @@ export class ProductRepository {
       return cachedProducts;
     }
 
-    try {
-      const response = await axios.get(PRODUCTS_API_URL, {
-        timeout: 15000,
-      });
+    for (let attempt = 1; attempt <= MAX_PROVIDER_ATTEMPTS; attempt += 1) {
+      incrementMetric("externalProviderRequests");
 
-      if (
-        !Array.isArray(response.data?.products) ||
-        !response.data.products.every(isExternalProduct)
-      ) {
-        throw new Error("External provider returned an invalid payload.");
+      try {
+        const response = await axios.get(PRODUCTS_API_URL, {
+          timeout: 15000,
+        });
+
+        if (
+          !Array.isArray(response.data?.products) ||
+          !response.data.products.every(isExternalProduct)
+        ) {
+          throw new Error("External provider returned an invalid payload.");
+        }
+
+        const products: Product[] = response.data.products.map(
+          (product: Product) => ({
+            ...product,
+            priceHistory: this.buildPriceHistory(product),
+          }),
+        );
+
+        cache.set(PRODUCTS_CACHE_KEY, products);
+        this.staleProducts = products;
+        incrementMetric("externalProviderSuccesses");
+
+        return products;
+      } catch (error) {
+        incrementMetric("externalProviderFailures");
+
+        const errorMessage = error instanceof AxiosError
+          ? `${error.code}: ${error.message}`
+          : String(error);
+
+        logger.warn("external_provider_request_failed", {
+          attempt,
+          maxAttempts: MAX_PROVIDER_ATTEMPTS,
+          message: errorMessage,
+        });
+
+        if (attempt < MAX_PROVIDER_ATTEMPTS) {
+          incrementMetric("externalProviderRetries");
+          await wait(RETRY_BASE_DELAY_MS * attempt);
+        }
       }
-
-      const products: Product[] = response.data.products.map(
-        (product: Product) => ({
-          ...product,
-          priceHistory: this.buildPriceHistory(product),
-        }),
-      );
-
-      cache.set(PRODUCTS_CACHE_KEY, products);
-      this.staleProducts = products;
-
-      return products;
-    } catch (error) {
-      const errorMessage = error instanceof AxiosError
-        ? `${error.code}: ${error.message}`
-        : String(error);
-
-      console.error(
-        `[ProductRepository] Failed to fetch products: ${errorMessage}`,
-      );
-
-      // Em caso de indisponibilidade temporária, prioriza continuidade de
-      // leitura com o último snapshot válido conhecido por esta instância.
-      if (this.staleProducts) {
-        return this.staleProducts;
-      }
-
-      throw new Error(
-        "Failed to retrieve products from external provider.",
-      );
     }
+
+    // Em caso de indisponibilidade temporária, prioriza continuidade de
+    // leitura com o último snapshot válido conhecido por esta instância.
+    if (this.staleProducts) {
+      incrementMetric("staleCacheFallbacks");
+      logger.warn("stale_cache_fallback_used");
+      return this.staleProducts;
+    }
+
+    throw new Error(
+      "Failed to retrieve products from external provider.",
+    );
   }
 }

@@ -36,6 +36,10 @@ const options: swaggerJsdoc.Options = {
         name: "Auth",
         description: "Operações de autenticação e segurança",
       },
+      {
+        name: "Operations",
+        description: "Health check e métricas operacionais",
+      },
     ],
 
     components: {
@@ -120,6 +124,17 @@ const options: swaggerJsdoc.Options = {
               type: "integer",
               example: 100,
             },
+          },
+        },
+
+        MetricsSnapshot: {
+          type: "object",
+          properties: {
+            externalProviderRequests: { type: "integer", example: 3 },
+            externalProviderSuccesses: { type: "integer", example: 1 },
+            externalProviderFailures: { type: "integer", example: 2 },
+            externalProviderRetries: { type: "integer", example: 2 },
+            staleCacheFallbacks: { type: "integer", example: 1 },
           },
         },
 

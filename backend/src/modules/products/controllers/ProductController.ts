@@ -50,25 +50,13 @@ export class ProductController {
   /**
    * Compara múltiplos produtos a partir de uma lista de IDs.
    *
-   * A validação mínima fica aqui por estar ligada ao contrato HTTP do body.
+   * O middleware declarativo já garante IDs inteiros, únicos e suficientes.
    */
   public async compare(
     request: Request,
     response: Response,
   ): Promise<Response> {
-    const { ids } = request.body;
-
-    if (!Array.isArray(ids) || ids.length < 2) {
-      return response.status(400).json({
-        message: "The ids field must contain at least two products.",
-      });
-    }
-
-    if (ids.some((id) => typeof id !== "number" || Number.isNaN(id))) {
-      return response.status(400).json({
-        message: "All ids must be valid numbers.",
-      });
-    }
+    const { ids } = request.body as { ids: number[] };
 
     const products = await this.productService.compareProducts(ids);
 

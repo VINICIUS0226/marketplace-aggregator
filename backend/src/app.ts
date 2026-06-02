@@ -16,6 +16,8 @@ import productRoutes from "./modules/products/routes/productRoutes";
 
 import { errorHandler } from "./shared/middlewares/errorHandler";
 import { swaggerSpec } from "./shared/config/swagger";
+import { getMetricsSnapshot } from "./shared/config/metrics";
+import { logger } from "./shared/utils/logger";
 
 dotenv.config();
 
@@ -53,7 +55,16 @@ app.use(
   }),
 );
 app.use(helmet());
-app.use(morgan("dev"));
+app.use(
+  morgan("combined", {
+    stream: {
+      write: (message) =>
+        logger.info("http_request", {
+          message: message.trim(),
+        }),
+    },
+  }),
+);
 app.use(express.json());
 
 /**
@@ -82,6 +93,31 @@ app.get(
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
     });
+  },
+);
+
+/**
+ * @swagger
+ * /metrics:
+ *   get:
+ *     summary: Consulta métricas operacionais
+ *     description: Retorna contadores em memória da integração externa e fallback stale.
+ *     tags: [Operations]
+ *     responses:
+ *       200:
+ *         description: Métricas retornadas com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/MetricsSnapshot"
+ */
+/**
+ * Métricas operacionais mínimas para observar integração e fallback.
+ */
+app.get(
+  "/metrics",
+  (_request: Request, response: Response) => {
+    return response.status(200).json(getMetricsSnapshot());
   },
 );
 

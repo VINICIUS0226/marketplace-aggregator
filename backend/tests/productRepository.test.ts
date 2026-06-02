@@ -1,6 +1,10 @@
 import axios from 'axios';
 import { ProductRepository } from '../src/modules/products/repositories/ProductRepository';
 import { cache } from '../src/shared/config/cache';
+import {
+  getMetricsSnapshot,
+  resetMetrics,
+} from '../src/shared/config/metrics';
 
 jest.mock('axios');
 
@@ -24,6 +28,8 @@ const exampleProducts = [
 describe('ProductRepository', () => {
   beforeEach(() => {
     cache.flushAll();
+    resetMetrics();
+    mockedAxios.get.mockReset();
   });
 
   it('fetches products from external API and caches the result', async () => {
@@ -40,6 +46,7 @@ describe('ProductRepository', () => {
     );
     expect(products[0].priceHistory).toHaveLength(5);
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
+    expect(getMetricsSnapshot().externalProviderSuccesses).toBe(1);
     expect((cache.get('products') as any)[0]).toEqual(
       expect.objectContaining({
         ...exampleProducts[0],
@@ -75,9 +82,10 @@ describe('ProductRepository', () => {
     const products = await repository.getAllProducts();
 
     cache.del('products');
-    mockedAxios.get.mockRejectedValueOnce(new Error('Network failure'));
+    mockedAxios.get.mockRejectedValue(new Error('Network failure'));
 
     await expect(repository.getAllProducts()).resolves.toEqual(products);
+    expect(getMetricsSnapshot().staleCacheFallbacks).toBe(1);
   });
 
   it('rejects invalid external payloads when no snapshot is available', async () => {
@@ -88,5 +96,7 @@ describe('ProductRepository', () => {
     await expect(repository.getAllProducts()).rejects.toThrow(
       'Failed to retrieve products from external provider.',
     );
+    expect(mockedAxios.get).toHaveBeenCalledTimes(3);
+    expect(getMetricsSnapshot().externalProviderRetries).toBe(2);
   });
 });

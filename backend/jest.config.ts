@@ -9,6 +9,14 @@ const config: Config.InitialOptions = {
   clearMocks: true,
   collectCoverage: true,
   coverageDirectory: 'coverage',
+  coverageThreshold: {
+    global: {
+      statements: 90,
+      branches: 80,
+      functions: 85,
+      lines: 90,
+    },
+  },
 };
 
 export default config;

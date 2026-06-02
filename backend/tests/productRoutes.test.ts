@@ -56,6 +56,21 @@ describe('Products API', () => {
     expect(response.body).toHaveProperty('totalPages', 2);
   });
 
+  it('should treat empty text filters as absent', async () => {
+    const response = await request(app).get('/products?page=1&search=&category=');
+
+    expect(response.status).toBe(200);
+    expect(response.body.data).toHaveLength(2);
+  });
+
+  it('should reject invalid pagination and price ranges', async () => {
+    const invalidPagination = await request(app).get('/products?page=0&limit=101');
+    const invalidPriceRange = await request(app).get('/products?minPrice=500&maxPrice=100');
+
+    expect(invalidPagination.status).toBe(400);
+    expect(invalidPriceRange.status).toBe(400);
+  });
+
   it('should return a product by id', async () => {
     const response = await request(app).get('/products/1');
 
@@ -68,6 +83,13 @@ describe('Products API', () => {
 
     expect(response.status).toBe(404);
     expect(response.body).toHaveProperty('message');
+  });
+
+  it('should reject a non-integer product id', async () => {
+    const response = await request(app).get('/products/invalid');
+
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty('message', 'Invalid request payload.');
   });
 
   it('should return categories list', async () => {
@@ -113,6 +135,15 @@ describe('Products API', () => {
     expect(response.body).toHaveProperty('message');
   });
 
+  it('should return 400 when compare ids are duplicated', async () => {
+    const response = await request(app)
+      .post('/products/compare')
+      .send({ ids: [1, 1] });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty('message');
+  });
+
   it('should login and return a JWT token', async () => {
     const response = await request(app)
       .post('/auth/login')
@@ -129,6 +160,15 @@ describe('Products API', () => {
 
     expect(response.status).toBe(401);
     expect(response.body).toHaveProperty('message');
+  });
+
+  it('should reject an incomplete login payload', async () => {
+    const response = await request(app)
+      .post('/auth/login')
+      .send({ username: 'admin' });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty('message', 'Invalid request payload.');
   });
 
   it('should refresh product cache when authorized', async () => {
@@ -156,5 +196,25 @@ describe('Products API', () => {
 
     expect(response.status).toBe(401);
     expect(response.body).toHaveProperty('message');
+  });
+
+  it('should return 401 when authorization does not use Bearer scheme', async () => {
+    const response = await request(app)
+      .post('/products/refresh-cache')
+      .set('Authorization', 'Basic invalid-token');
+
+    expect(response.status).toBe(401);
+    expect(response.body).toHaveProperty(
+      'message',
+      'Authorization header must use the Bearer scheme.',
+    );
+  });
+
+  it('should expose operational metrics', async () => {
+    const response = await request(app).get('/metrics');
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('externalProviderRequests');
+    expect(response.body).toHaveProperty('staleCacheFallbacks');
   });
 });

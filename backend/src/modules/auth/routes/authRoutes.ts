@@ -1,6 +1,8 @@
 import { Router } from "express";
 import { AuthController } from "../controllers/AuthController";
 import { asyncHandler } from "../../../shared/utils/asyncHandler";
+import { validateRequest } from "../../../shared/middlewares/validate";
+import { loginBodySchema } from "../schemas/authSchemas";
 
 /**
  * Rotas de autenticação.
@@ -57,6 +59,7 @@ const authController = new AuthController();
  */
 authRouter.post(
   "/login",
+  validateRequest({ body: loginBodySchema }),
   asyncHandler(authController.login.bind(authController)),
 );
 

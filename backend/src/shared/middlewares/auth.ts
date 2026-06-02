@@ -22,11 +22,11 @@ export function authenticateToken(
     });
   }
 
-  const [, token] = authHeader.split(" ");
+  const [scheme, token] = authHeader.split(" ");
 
-  if (!token) {
+  if (scheme !== "Bearer" || !token) {
     return response.status(401).json({
-      message: "Token is missing.",
+      message: "Authorization header must use the Bearer scheme.",
     });
   }
 

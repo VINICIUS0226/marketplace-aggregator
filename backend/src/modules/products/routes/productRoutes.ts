@@ -3,6 +3,12 @@ import { Router } from "express";
 import { ProductController } from "../controllers/ProductController";
 import { asyncHandler } from "../../../shared/utils/asyncHandler";
 import { authenticateToken } from "../../../shared/middlewares/auth";
+import { validateRequest } from "../../../shared/middlewares/validate";
+import {
+  compareProductsBodySchema,
+  listProductsQuerySchema,
+  productIdParamsSchema,
+} from "../schemas/productSchemas";
 
 /**
  * Rotas HTTP do domínio de produtos.
@@ -52,11 +58,14 @@ const productController = new ProductController();
  *         schema:
  *           type: integer
  *           default: 1
+ *           minimum: 1
  *       - in: query
  *         name: limit
  *         schema:
  *           type: integer
  *           default: 10
+ *           minimum: 1
+ *           maximum: 100
  *     responses:
  *       200:
  *         description: Lista de produtos retornada com sucesso.
@@ -67,6 +76,7 @@ const productController = new ProductController();
  */
 productsRouter.get(
   "/",
+  validateRequest({ query: listProductsQuerySchema }),
   asyncHandler(productController.list.bind(productController)),
 );
 
@@ -111,6 +121,7 @@ productsRouter.get(
  *               ids:
  *                 type: array
  *                 minItems: 2
+ *                 uniqueItems: true
  *                 items:
  *                   type: integer
  *             example:
@@ -133,6 +144,7 @@ productsRouter.get(
  */
 productsRouter.post(
   "/compare",
+  validateRequest({ body: compareProductsBodySchema }),
   asyncHandler(productController.compare.bind(productController)),
 );
 
@@ -195,6 +207,7 @@ productsRouter.post(
  */
 productsRouter.get(
   "/:id",
+  validateRequest({ params: productIdParamsSchema }),
   asyncHandler(productController.show.bind(productController)),
 );
 
