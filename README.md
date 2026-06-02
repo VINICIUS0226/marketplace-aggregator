@@ -9,7 +9,7 @@ Solução fullstack para o Case Técnico de Desenvolvedor(a) Fullstack Sênior d
 ![Docker](https://img.shields.io/badge/Docker-Enabled-blue)
 ![Swagger](https://img.shields.io/badge/Swagger-OpenAPI-green)
 ![CI](https://github.com/VINICIUS0226/marketplace-aggregator/actions/workflows/ci.yml/badge.svg)
-[![codecov](https://codecov.io/gh/VINICIUS0226/marketplace-aggregator/branch/master/graph/badge.svg)](https://codecov.io/gh/VINICIUS0226/marketplace-aggregator)
+[![Coverage Status](https://coveralls.io/repos/github/VINICIUS0226/marketplace-aggregator/badge.svg?branch=master)](https://coveralls.io/github/VINICIUS0226/marketplace-aggregator?branch=master)
 
 ## Visão Geral
 
@@ -47,7 +47,7 @@ Diferenciais implementados:
 - Documentação Swagger/OpenAPI.
 - Testes E2E com Playwright.
 - Pipeline de CI no GitHub Actions.
-- Cobertura publicada no Codecov com autenticação OIDC.
+- Cobertura agregada de backend e frontend publicada no Coveralls.
 - Lazy loading por rota para reduzir o bundle inicial do frontend.
 
 ## Stack
@@ -395,7 +395,7 @@ O workflow em `.github/workflows/ci.yml` executa:
 - Testes E2E.
 - Build do frontend.
 - Upload dos relatórios de coverage como artefatos.
-- Upload dos relatórios para Codecov autenticado por OIDC, sem segredo persistido.
+- Upload dos relatórios para Coveralls com agregação das coberturas de backend e frontend.
 
 ## Decisões de Arquitetura
 

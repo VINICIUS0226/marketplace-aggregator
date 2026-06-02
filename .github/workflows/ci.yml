@@ -10,7 +10,6 @@ on:
 
 permissions:
   contents: read
-  id-token: write
 
 jobs:
   backend:
@@ -32,14 +31,12 @@ jobs:
           name: backend-coverage
           path: backend/coverage
 
-      - name: Upload backend coverage to Codecov
-        uses: codecov/codecov-action@v6
+      - name: Upload backend coverage to Coveralls
+        uses: coverallsapp/github-action@v2
         with:
-          disable_search: true
-          fail_ci_if_error: true
-          files: ./backend/coverage/lcov.info
-          flags: backend
-          use_oidc: true
+          file: ./backend/coverage/lcov.info
+          flag-name: backend
+          parallel: true
 
   frontend:
     runs-on: ubuntu-latest
@@ -75,13 +72,23 @@ jobs:
           name: frontend-coverage
           path: frontend/coverage
 
-      - name: Upload frontend coverage to Codecov
-        uses: codecov/codecov-action@v6
+      - name: Upload frontend coverage to Coveralls
+        uses: coverallsapp/github-action@v2
         with:
-          disable_search: true
-          fail_ci_if_error: true
-          files: ./frontend/coverage/lcov.info
-          flags: frontend
-          use_oidc: true
+          file: ./frontend/coverage/lcov.info
+          flag-name: frontend
+          parallel: true
 
       - run: npm run build
+
+  coverage:
+    needs:
+      - backend
+      - frontend
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Finish Coveralls coverage aggregation
+        uses: coverallsapp/github-action@v2
+        with:
+          parallel-finished: true
