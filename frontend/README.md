@@ -6,7 +6,7 @@ Interface React do Marketplace Aggregator.
 
 - Listar produtos com paginação, busca e filtros.
 - Exibir detalhes e histórico sintético de preços.
-- Manter a seleção local de produtos para comparação lado a lado.
+- Manter a seleção de produtos para comparação lado a lado durante a sessão da aba.
 - Consumir a API REST do backend com React Query e Axios.
 
 ## Desenvolvimento

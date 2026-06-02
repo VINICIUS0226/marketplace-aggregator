@@ -80,6 +80,20 @@ describe("Compare page", () => {
     expect(screen.getByText("R$ 3.999,00")).toBeInTheDocument();
   });
 
+  it("renders revalidated stock returned by the API", () => {
+    const staleProducts = products.map((product) => ({
+      ...product,
+      stock: product.stock + 100,
+    }));
+
+    renderCompare(staleProducts);
+
+    expect(screen.getByText("7")).toBeInTheDocument();
+    expect(screen.getByText("12")).toBeInTheDocument();
+    expect(screen.queryByText("107")).not.toBeInTheDocument();
+    expect(screen.queryByText("112")).not.toBeInTheDocument();
+  });
+
   it("shows progress while loading the comparison", () => {
     vi.mocked(useComparedProducts).mockReturnValue({
       data: undefined,

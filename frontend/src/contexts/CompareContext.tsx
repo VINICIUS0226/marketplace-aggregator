@@ -1,10 +1,29 @@
 import {
+  useEffect,
   useState,
   type ReactNode,
 } from "react";
 
 import type { Product } from "../types/Product";
 import { CompareContext } from "./compareStore";
+
+const SELECTED_PRODUCTS_KEY = "marketplace:selected-products";
+
+function loadSelectedProducts(): Product[] {
+  try {
+    const storedProducts = sessionStorage.getItem(SELECTED_PRODUCTS_KEY);
+
+    if (!storedProducts) return [];
+
+    const parsedProducts: unknown = JSON.parse(storedProducts);
+
+    return Array.isArray(parsedProducts)
+      ? parsedProducts as Product[]
+      : [];
+  } catch {
+    return [];
+  }
+}
 
 /**
  * Estado global mínimo para a comparação.
@@ -18,7 +37,14 @@ export function CompareProvider({
   children: ReactNode;
 }) {
   const [selectedProducts, setSelectedProducts] =
-    useState<Product[]>([]);
+    useState<Product[]>(loadSelectedProducts);
+
+  useEffect(() => {
+    sessionStorage.setItem(
+      SELECTED_PRODUCTS_KEY,
+      JSON.stringify(selectedProducts),
+    );
+  }, [selectedProducts]);
 
   function addProduct(product: Product) {
     const exists = selectedProducts.find(

@@ -154,7 +154,7 @@ export function Compare() {
               <TableRow sx={{ bgcolor: "background.default" }}>
                 <TableCell sx={{ fontWeight: 700, py: 2 }}>Stock</TableCell>
 
-                {selectedProducts.map((product) => (
+                {comparedProducts.map((product) => (
                   <TableCell key={product.id} sx={{ textAlign: "center", py: 2 }}>
                     {product.stock}
                   </TableCell>
