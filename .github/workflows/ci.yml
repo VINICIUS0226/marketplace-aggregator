@@ -21,7 +21,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - run: npm install
+      - run: npm ci
       - name: Run backend tests with coverage
         run: npm test -- --coverage
       - name: Upload backend coverage
@@ -49,15 +49,24 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - run: npm install
+      - run: npm ci
       - name: Install backend dependencies for E2E
-        run: cd ../backend && npm install
+        run: cd ../backend && npm ci
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
       - name: Run frontend tests with coverage
         run: npm test -- --coverage
       - name: Run frontend E2E tests
         run: npm run test:e2e
+      - name: Upload Playwright failure artifacts
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-failure-artifacts
+          path: |
+            frontend/test-results
+            frontend/playwright-report
+          if-no-files-found: ignore
       - name: Upload frontend coverage
         uses: actions/upload-artifact@v4
         with:
