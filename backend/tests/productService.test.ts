@@ -95,6 +95,12 @@ describe('ProductService', () => {
     expect(products).toHaveLength(2);
   });
 
+  it('rejects comparison when any requested product does not exist', async () => {
+    await expect(service.compareProducts([1, 999])).rejects.toThrow(
+      'One or more products were not found',
+    );
+  });
+
   it('returns distinct categories', async () => {
     const categories = await service.getCategories();
 

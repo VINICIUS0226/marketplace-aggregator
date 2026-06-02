@@ -65,6 +65,30 @@ describe('ProductRepository', () => {
     expect(mockedAxios.get).not.toHaveBeenCalled();
   });
 
+  it('shares one external request between concurrent cold-cache loads', async () => {
+    let resolveRequest: (value: { data: { products: typeof exampleProducts } }) => void;
+    const pendingRequest = new Promise<{ data: { products: typeof exampleProducts } }>(
+      (resolve) => {
+        resolveRequest = resolve;
+      },
+    );
+
+    mockedAxios.get.mockReturnValue(pendingRequest);
+
+    const repository = new ProductRepository();
+    const firstLoad = repository.getAllProducts();
+    const secondLoad = repository.getAllProducts();
+
+    resolveRequest!({ data: { products: exampleProducts } });
+
+    await expect(Promise.all([firstLoad, secondLoad])).resolves.toEqual([
+      expect.any(Array),
+      expect.any(Array),
+    ]);
+    expect(mockedAxios.get).toHaveBeenCalledTimes(1);
+    expect(getMetricsSnapshot().externalProviderRequests).toBe(1);
+  });
+
   it('throws a general error when external API fails', async () => {
     mockedAxios.get.mockRejectedValue(new Error('Network failure'));
 

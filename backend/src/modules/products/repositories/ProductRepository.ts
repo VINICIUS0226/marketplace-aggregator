@@ -56,6 +56,7 @@ function isExternalProduct(product: unknown): product is Product {
  */
 export class ProductRepository {
   private staleProducts: Product[] | null = null;
+  private productsLoadPromise: Promise<Product[]> | null = null;
 
   /**
    * Cria um histórico sintético de preço para demonstrar o diferencial pedido
@@ -108,6 +109,24 @@ export class ProductRepository {
       return cachedProducts;
     }
 
+    if (this.productsLoadPromise) {
+      return this.productsLoadPromise;
+    }
+
+    this.productsLoadPromise = this.loadProducts();
+
+    try {
+      return await this.productsLoadPromise;
+    } finally {
+      this.productsLoadPromise = null;
+    }
+  }
+
+  /**
+   * Centraliza a carga externa para que chamadas concorrentes compartilhem a
+   * mesma Promise enquanto o cache ainda está frio.
+   */
+  private async loadProducts(): Promise<Product[]> {
     for (let attempt = 1; attempt <= MAX_PROVIDER_ATTEMPTS; attempt += 1) {
       incrementMetric("externalProviderRequests");
 

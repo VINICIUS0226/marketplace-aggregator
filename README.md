@@ -23,6 +23,7 @@ O desafio pedia qualidade sobre quantidade. Por isso, a solução prioriza arqui
 - A DummyJSON representa a integração externa com marketplaces para fins de avaliação técnica.
 - A paginação e os filtros são aplicados pela API local após a ingestão dos produtos.
 - O histórico de preços é sintético e demonstrativo, pois não existe persistência temporal no escopo atual.
+- A DummyJSON não informa moeda. A interface apresenta preços em BRL apenas como convenção demonstrativa do catálogo.
 - A autenticação JWT protege uma operação administrativa, mas não representa um sistema completo de usuários.
 
 ## Funcionalidades
@@ -43,6 +44,7 @@ Diferenciais implementados:
 - Docker Compose para subir backend e frontend com um comando.
 - Histórico sintético de preços por produto, exibido na tela de detalhe.
 - Cache em memória, timeout e tratamento de falhas na integração externa.
+- Single-flight durante cache frio para compartilhar uma única carga externa entre requisições concorrentes.
 - Rate limiting, CORS e Helmet.
 - Documentação Swagger/OpenAPI.
 - Testes E2E com Playwright.
@@ -125,7 +127,7 @@ GET /products
   -> DummyJSON em caso de cache miss
 ```
 
-O repository aplica timeout de 15 segundos, três tentativas com backoff progressivo e normalização do payload recebido antes de disponibilizá-lo às outras camadas.
+O repository aplica timeout de 15 segundos, três tentativas com backoff progressivo, single-flight durante cache frio e normalização do payload recebido antes de disponibilizá-lo às outras camadas.
 
 ## Clonar o Repositório
 
@@ -345,6 +347,7 @@ Body:
 ```
 
 `ids` exige ao menos dois inteiros positivos e não permite duplicação.
+Todos os IDs solicitados devem existir; a API retorna `404` em vez de produzir uma comparação parcial.
 
 ### Atualizar Cache
 
@@ -402,7 +405,7 @@ docker compose up -d --build
 
 Resultados observados:
 
-- `32/32` testes automatizados do backend aprovados.
+- `35/35` testes automatizados do backend aprovados.
 - `15/15` testes unitários e de componente do frontend aprovados.
 - `6/6` testes E2E aprovados: listagem, detalhe, comparação, autenticação, fallback resiliente e geração das evidências visuais.
 - Build do frontend aprovado.
@@ -441,6 +444,7 @@ O workflow em `.github/workflows/ci.yml` executa:
 - Timeout configurado na chamada externa.
 - Três tentativas com backoff progressivo antes de recorrer ao fallback.
 - Cache em memória para reduzir chamadas repetidas à DummyJSON.
+- Single-flight para evitar cargas externas duplicadas enquanto o cache ainda está frio.
 - Fallback para o último snapshot válido quando a fonte externa falha após uma carga bem-sucedida.
 - E2E controlado para validar o fallback sem depender de indisponibilidade real da DummyJSON.
 - Validação do payload recebido antes de atualizar o cache.

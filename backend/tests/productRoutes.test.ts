@@ -144,6 +144,18 @@ describe('Products API', () => {
     expect(response.body).toHaveProperty('message');
   });
 
+  it('should return 404 when compare includes a non-existing product', async () => {
+    const response = await request(app)
+      .post('/products/compare')
+      .send({ ids: [1, 999] });
+
+    expect(response.status).toBe(404);
+    expect(response.body).toHaveProperty(
+      'message',
+      'One or more products were not found',
+    );
+  });
+
   it('should login and return a JWT token', async () => {
     const response = await request(app)
       .post('/auth/login')

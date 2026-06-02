@@ -156,8 +156,8 @@ export class ProductService {
   /**
    * Retorna os produtos selecionados para comparação.
    *
-   * IDs duplicados ou inexistentes não geram duplicidade na resposta, pois a
-   * comparação é baseada na coleção canônica carregada pelo repository.
+   * O schema impede duplicados e esta camada rejeita IDs inexistentes para não
+   * retornar uma comparação parcial silenciosamente.
    */
   public async compareProducts(
     ids: number[],
@@ -165,9 +165,15 @@ export class ProductService {
     const products =
       await this.productRepository.getAllProducts();
 
-    return products.filter((product) =>
+    const comparedProducts = products.filter((product) =>
       ids.includes(product.id),
     );
+
+    if (comparedProducts.length !== ids.length) {
+      throw new AppError("One or more products were not found", 404);
+    }
+
+    return comparedProducts;
   }
 
   /**

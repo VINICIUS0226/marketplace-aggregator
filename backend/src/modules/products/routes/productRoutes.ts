@@ -73,6 +73,12 @@ const productController = new ProductController();
  *           application/json:
  *             schema:
  *               $ref: "#/components/schemas/PaginatedProducts"
+ *       400:
+ *         description: Parâmetros de paginação ou filtros inválidos.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/ErrorResponse"
  */
 productsRouter.get(
   "/",
@@ -141,6 +147,12 @@ productsRouter.get(
  *           application/json:
  *             schema:
  *               $ref: "#/components/schemas/ErrorResponse"
+ *       404:
+ *         description: Um ou mais produtos solicitados não existem.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/ErrorResponse"
  */
 productsRouter.post(
   "/compare",
@@ -198,6 +210,12 @@ productsRouter.post(
  *           application/json:
  *             schema:
  *               $ref: "#/components/schemas/Product"
+ *       400:
+ *         description: Identificador inválido.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/ErrorResponse"
  *       404:
  *         description: Produto não encontrado.
  *         content:
