@@ -22,6 +22,7 @@ import {
 } from "./shared/config/metrics";
 import { logger } from "./shared/utils/logger";
 import { observabilityMiddleware } from "./shared/middlewares/observability";
+import { createErrorResponse } from "./shared/utils/errorResponse";
 
 dotenv.config();
 
@@ -84,6 +85,16 @@ app.use(
     limit: 100,
     standardHeaders: "draft-7",
     legacyHeaders: false,
+    skip: (request) =>
+      request.path === "/health" ||
+      request.path === "/metrics" ||
+      request.path === "/metrics/prometheus",
+    handler: (_request, response) =>
+      response.status(429).json(
+        createErrorResponse(
+          "Too many requests. Please try again later.",
+        ),
+      ),
   }),
 );
 

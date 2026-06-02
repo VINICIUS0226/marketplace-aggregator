@@ -19,8 +19,8 @@ const exampleProducts = [
     category: 'test',
     rating: 4,
     stock: 10,
-    thumbnail: 'test.png',
-    images: ['test.png'],
+    thumbnail: 'https://example.com/test.png',
+    images: ['https://example.com/test.png'],
     priceHistory: [],
   },
 ];
@@ -126,5 +126,19 @@ describe('ProductRepository', () => {
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(3);
     expect(getMetricsSnapshot().externalProviderRetries).toBe(2);
+  });
+
+  it('rejects semantically invalid external products', async () => {
+    mockedAxios.get.mockResolvedValue({
+      data: {
+        products: [{ ...exampleProducts[0], stock: -1 }],
+      },
+    });
+
+    const repository = new ProductRepository();
+
+    await expect(repository.getAllProducts()).rejects.toThrow(
+      'Failed to retrieve products from external provider.',
+    );
   });
 });

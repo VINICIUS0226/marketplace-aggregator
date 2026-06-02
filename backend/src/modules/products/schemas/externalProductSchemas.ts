@@ -9,14 +9,14 @@ import { z } from "zod";
 export const externalProductSchema = z
   .object({
     id: z.number().int().positive(),
-    title: z.string(),
-    description: z.string(),
-    category: z.string(),
-    price: z.number(),
-    rating: z.number(),
-    stock: z.number().int(),
-    thumbnail: z.string(),
-    images: z.array(z.string()),
+    title: z.string().min(1),
+    description: z.string().min(1),
+    category: z.string().min(1),
+    price: z.number().nonnegative(),
+    rating: z.number().min(0).max(5),
+    stock: z.number().int().nonnegative(),
+    thumbnail: z.url(),
+    images: z.array(z.url()).min(1),
   })
   .passthrough();
 

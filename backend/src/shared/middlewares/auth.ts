@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
 import { authConfig } from "../config/auth";
+import { createErrorResponse } from "../utils/errorResponse";
 
 /**
  * Middleware de autenticação para rotas operacionais.
@@ -17,17 +18,19 @@ export function authenticateToken(
   const authHeader = request.headers.authorization;
 
   if (!authHeader) {
-    return response.status(401).json({
-      message: "Authorization header is missing.",
-    });
+    return response
+      .status(401)
+      .json(createErrorResponse("Authorization header is missing."));
   }
 
   const [scheme, token] = authHeader.split(" ");
 
   if (scheme !== "Bearer" || !token) {
-    return response.status(401).json({
-      message: "Authorization header must use the Bearer scheme.",
-    });
+    return response.status(401).json(
+      createErrorResponse(
+        "Authorization header must use the Bearer scheme.",
+      ),
+    );
   }
 
   try {
@@ -35,8 +38,8 @@ export function authenticateToken(
 
     return next();
   } catch {
-    return response.status(401).json({
-      message: "Invalid or expired token.",
-    });
+    return response
+      .status(401)
+      .json(createErrorResponse("Invalid or expired token."));
   }
 }

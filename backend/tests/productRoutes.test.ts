@@ -46,6 +46,16 @@ describe('Products API', () => {
     expect(response.body).toHaveProperty('uptime');
   });
 
+  it('should exclude operational routes from API rate limiting', async () => {
+    const healthResponse = await request(app).get('/health');
+    const metricsResponse = await request(app).get('/metrics');
+    const productsResponse = await request(app).get('/products');
+
+    expect(healthResponse.headers).not.toHaveProperty('ratelimit-policy');
+    expect(metricsResponse.headers).not.toHaveProperty('ratelimit-policy');
+    expect(productsResponse.headers).toHaveProperty('ratelimit-policy');
+  });
+
   it('should propagate correlation and W3C trace identifiers', async () => {
     const traceId = 'a'.repeat(32);
     const response = await request(app)
@@ -82,6 +92,7 @@ describe('Products API', () => {
 
     expect(invalidPagination.status).toBe(400);
     expect(invalidPriceRange.status).toBe(400);
+    expect(invalidPagination.body).toHaveProperty('success', false);
   });
 
   it('should return a product by id', async () => {
@@ -96,6 +107,7 @@ describe('Products API', () => {
 
     expect(response.status).toBe(404);
     expect(response.body).toHaveProperty('message');
+    expect(response.body).toHaveProperty('success', false);
   });
 
   it('should reject a non-integer product id', async () => {
@@ -185,6 +197,7 @@ describe('Products API', () => {
 
     expect(response.status).toBe(401);
     expect(response.body).toHaveProperty('message');
+    expect(response.body).toHaveProperty('success', false);
   });
 
   it('should reject an incomplete login payload', async () => {

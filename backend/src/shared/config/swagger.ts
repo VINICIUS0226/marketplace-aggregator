@@ -167,6 +167,7 @@ const options: swaggerJsdoc.Options = {
 
         ErrorResponse: {
           type: "object",
+          required: ["success", "message"],
           properties: {
             success: {
               type: "boolean",

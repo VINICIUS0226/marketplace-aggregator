@@ -7,6 +7,7 @@ import {
   ZodType,
   ZodError,
 } from "zod";
+import { createErrorResponse } from "../utils/errorResponse";
 
 interface RequestSchemas {
   body?: ZodType;
@@ -36,13 +37,15 @@ export function validateRequest(schemas: RequestSchemas) {
       next();
     } catch (error) {
       if (error instanceof ZodError) {
-        return response.status(400).json({
-          message: "Invalid request payload.",
-          issues: error.issues.map((issue) => ({
-            path: issue.path.join("."),
-            message: issue.message,
-          })),
-        });
+        return response.status(400).json(
+          createErrorResponse(
+            "Invalid request payload.",
+            error.issues.map((issue) => ({
+              path: issue.path.join("."),
+              message: issue.message,
+            })),
+          ),
+        );
       }
 
       next(error);

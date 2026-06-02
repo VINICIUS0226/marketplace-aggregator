@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { sign } from "jsonwebtoken";
 import { authConfig } from "../../../shared/config/auth";
+import { createErrorResponse } from "../../../shared/utils/errorResponse";
 
 /**
  * Usuário fixo para manter o escopo do case controlado.
@@ -24,18 +25,18 @@ export class AuthController {
     const { username, password } = request.body;
 
     if (!username || !password) {
-      return response.status(400).json({
-        message: "Username and password are required.",
-      });
+      return response.status(400).json(
+        createErrorResponse("Username and password are required."),
+      );
     }
 
     if (
       username !== VALID_USER.username ||
       password !== VALID_USER.password
     ) {
-      return response.status(401).json({
-        message: "Invalid username or password.",
-      });
+      return response
+        .status(401)
+        .json(createErrorResponse("Invalid username or password."));
     }
 
     const token = sign(

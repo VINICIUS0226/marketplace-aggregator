@@ -6,6 +6,7 @@ import {
 
 import { AppError } from "../errors/AppError";
 import { logger } from "../utils/logger";
+import { createErrorResponse } from "../utils/errorResponse";
 
 /**
  * Middleware global de erros.
@@ -20,10 +21,9 @@ export function errorHandler(
   _next: NextFunction,
 ): Response {
   if (error instanceof AppError) {
-    return response.status(error.statusCode).json({
-      success: false,
-      message: error.message,
-    });
+    return response
+      .status(error.statusCode)
+      .json(createErrorResponse(error.message));
   }
 
   logger.error("unhandled_request_error", {
@@ -32,8 +32,7 @@ export function errorHandler(
     message: error.message,
   });
 
-  return response.status(500).json({
-    success: false,
-    message: "Internal Server Error",
-  });
+  return response
+    .status(500)
+    .json(createErrorResponse("Internal Server Error"));
 }
