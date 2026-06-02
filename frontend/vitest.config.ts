@@ -9,5 +9,8 @@ export default defineConfig({
     setupFiles: './src/setupTests.ts',
     include: ['src/**/*.{test,spec}.{js,ts,tsx}'],
     exclude: ['e2e/**'],
+    coverage: {
+      reporter: ['text', 'html', 'clover', 'json', 'lcov'],
+    },
   },
 })
