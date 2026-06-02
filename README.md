@@ -404,6 +404,8 @@ O workflow em `.github/workflows/ci.yml` executa:
 
 - Timeout configurado na chamada externa.
 - Cache em memória para reduzir chamadas repetidas à DummyJSON.
+- Fallback para o último snapshot válido quando a fonte externa falha após uma carga bem-sucedida.
+- Validação mínima do payload recebido antes de atualizar o cache.
 - Middleware global de erro no backend.
 - Respostas padronizadas para erros conhecidos.
 - Health check para o Docker Compose.
@@ -425,7 +427,7 @@ Esses pontos aumentariam a complexidade sem serem necessários para cumprir o co
 ## Limitações Conhecidas
 
 - O cache em memória é local ao processo e não é compartilhado entre instâncias.
-- O fallback atual retorna erro quando a DummyJSON está indisponível e não existe valor previamente cacheado.
+- O fallback retorna erro quando a DummyJSON está indisponível e a instância ainda não possui snapshot válido.
 - As credenciais de demonstração são fixas e existem apenas para evidenciar proteção de rota.
 - O histórico de preços não é persistido entre reinicializações.
 - A comparação é mantida no estado do browser e não sobrevive a refresh da página.
@@ -439,6 +441,24 @@ Esses pontos aumentariam a complexidade sem serem necessários para cumprir o co
 - Criar deploy público.
 - Publicar badge real de coverage via Codecov ou Coveralls.
 - Adicionar screenshots em `docs/` para evidenciar Swagger, listagem, detalhe e comparação.
+
+## Evidências Visuais
+
+### Lista de Produtos
+
+![Lista de produtos](docs/products.png)
+
+### Detalhe e Histórico de Preços
+
+![Detalhe do produto](docs/product-detail.png)
+
+### Comparação de Produtos
+
+![Comparação de produtos](docs/comparison.png)
+
+### Swagger
+
+![Documentação Swagger](docs/swagger.png)
 
 ## Autor
 
