@@ -8,6 +8,8 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
+      - AUTH_SECRET=${AUTH_SECRET:-marketplace-secret}
+      - CORS_ORIGINS=http://localhost
     ports:
       - "3000:3000"
     restart: unless-stopped
