@@ -13,6 +13,7 @@ import {
   Paper,
   Button,
   Chip,
+  Alert,
 } from "@mui/material";
 
 import ClearAllIcon from "@mui/icons-material/ClearAll";
@@ -33,7 +34,7 @@ export function Products() {
   const [maxPrice, setMaxPrice] = useState<number | "">("");
   const [page, setPage] = useState(1);
 
-  const { data, isLoading } = useProducts({
+  const { data, isLoading, isError, refetch } = useProducts({
     page,
     search,
     category,
@@ -202,6 +203,17 @@ export function Products() {
             </Grid>
           ))}
         </Grid>
+      ) : isError ? (
+        <Alert
+          severity="error"
+          action={
+            <Button color="inherit" size="small" onClick={() => refetch()}>
+              Tentar novamente
+            </Button>
+          }
+        >
+          Não foi possível carregar os produtos. Verifique sua conexão e tente novamente.
+        </Alert>
       ) : data?.data.length === 0 ? (
         <Box sx={{ mt: 4, textAlign: "center" }}>
           <Typography variant="h6" color="text.secondary">

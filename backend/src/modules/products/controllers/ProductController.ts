@@ -58,9 +58,9 @@ export class ProductController {
   ): Promise<Response> {
     const { ids } = request.body;
 
-    if (!Array.isArray(ids) || ids.length === 0) {
+    if (!Array.isArray(ids) || ids.length < 2) {
       return response.status(400).json({
-        message: "The ids field must be a non-empty array.",
+        message: "The ids field must contain at least two products.",
       });
     }
 

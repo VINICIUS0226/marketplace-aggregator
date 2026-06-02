@@ -100,6 +100,7 @@ productsRouter.get(
  *             properties:
  *               ids:
  *                 type: array
+ *                 minItems: 2
  *                 items:
  *                   type: integer
  *             example:
