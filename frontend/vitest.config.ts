@@ -12,10 +12,10 @@ export default defineConfig({
     coverage: {
       reporter: ['text', 'html', 'clover', 'json', 'lcov'],
       thresholds: {
-        statements: 70,
-        branches: 70,
-        functions: 65,
-        lines: 70,
+        statements: 80,
+        branches: 80,
+        functions: 70,
+        lines: 80,
       },
     },
   },

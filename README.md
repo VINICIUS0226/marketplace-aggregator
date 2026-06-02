@@ -199,6 +199,9 @@ Serviços da composição de produção:
 | Frontend | http://localhost |
 | Backend | http://localhost:3000 |
 | Swagger | http://localhost:3000/api-docs |
+| Health Check | http://localhost:3000/health |
+| Métricas | http://localhost:3000/metrics |
+| Métricas Prometheus | http://localhost:3000/metrics/prometheus |
 
 A composição padrão publica o servidor Vite na porta `5173`. A composição de
 produção publica o Nginx na porta HTTP padrão `80`, por isso o frontend é
@@ -210,7 +213,7 @@ Backend:
 
 ```bash
 cd backend
-npm install
+npm ci
 npm run dev
 ```
 
@@ -218,7 +221,7 @@ Frontend:
 
 ```bash
 cd frontend
-npm install
+npm ci
 npm run dev
 ```
 
@@ -410,6 +413,7 @@ Antes da entrega, foram executados localmente:
 
 ```bash
 cd backend && npm test
+cd backend && npm run build
 cd frontend && npm test
 cd frontend && npm run build
 cd frontend && npm run test:e2e
@@ -421,11 +425,35 @@ Resultados observados:
 - `37/37` testes automatizados do backend aprovados.
 - `20/20` testes unitários e de componente do frontend aprovados.
 - `7/7` testes E2E aprovados: listagem, detalhe, comparação desktop e mobile, autenticação, fallback resiliente e geração das evidências visuais.
+- Build do backend aprovado.
 - Build do frontend aprovado.
 - Cobertura mínima protegida por thresholds no Jest e Vitest.
 - Backend saudável via `GET /health`.
 - Frontend acessível em `http://localhost:5173` com a composição padrão e em `http://localhost` com a composição de produção.
 - Pipeline do GitHub Actions aprovado em `master`.
+
+## Troubleshooting
+
+Se as portas locais estiverem ocupadas, encerre a aplicação que já as utiliza
+ou ajuste o mapeamento de portas no arquivo Compose escolhido:
+
+| Porta | Serviço | Comando útil |
+| --- | --- | --- |
+| `80` | Frontend Nginx da composição de produção | `docker compose -f docker-compose.prod.yml down` |
+| `3000` | Backend | `docker compose down` ou `docker compose -f docker-compose.prod.yml down` |
+| `5173` | Frontend Vite da composição padrão | `docker compose down` |
+
+Para identificar processos locais que ainda utilizam uma porta no Windows:
+
+```powershell
+Get-NetTCPConnection -LocalPort 80,3000,5173 -ErrorAction SilentlyContinue
+```
+
+No Linux ou macOS:
+
+```bash
+lsof -i :80 -i :3000 -i :5173
+```
 
 ## CI
 

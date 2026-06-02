@@ -12,7 +12,7 @@ Interface React do Marketplace Aggregator.
 ## Desenvolvimento
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
