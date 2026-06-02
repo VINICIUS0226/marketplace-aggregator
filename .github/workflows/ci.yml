@@ -28,6 +28,13 @@ jobs:
           name: backend-coverage
           path: coverage
 
+      - name: Upload backend coverage to Codecov
+        if: ${{ secrets.CODECOV_TOKEN != '' }}
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage/lcov.info
+          token: ${{ secrets.CODECOV_TOKEN }}
+
   frontend:
     runs-on: ubuntu-latest
     defaults:
@@ -39,11 +46,25 @@ jobs:
         with:
           node-version: '20'
       - run: npm install
+      - name: Install backend dependencies for E2E
+        run: cd ../backend && npm install
+      - name: Install Playwright browsers
+        run: npx playwright install chromium
       - name: Run frontend tests with coverage
         run: npm test -- --coverage
+      - name: Run optional frontend E2E tests
+        run: npm run test:e2e
       - name: Upload frontend coverage
         uses: actions/upload-artifact@v4
         with:
           name: frontend-coverage
           path: coverage
+
+      - name: Upload frontend coverage to Codecov
+        if: ${{ secrets.CODECOV_TOKEN != '' }}
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage/lcov.info
+          token: ${{ secrets.CODECOV_TOKEN }}
+
       - run: npm run build

@@ -1,15 +1,51 @@
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import App from './App';
+import React from "react";
+import { render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 
-describe('App component', () => {
-  it('renders the app title and increments counter', async () => {
+import App from "./App";
+import { api } from "./services/api";
+
+vi.mock("./services/api", () => ({
+  api: {
+    get: vi.fn(),
+  },
+}));
+
+describe("App component", () => {
+  it("renders the marketplace products page", async () => {
+    vi.mocked(api.get).mockImplementation(async (url) => {
+      if (url === "/products/categories") {
+        return { data: ["notebooks"] };
+      }
+
+      return {
+        data: {
+          data: [
+            {
+              id: 1,
+              title: "Notebook Pro",
+              description: "High performance notebook",
+              price: 4999,
+              category: "notebooks",
+              thumbnail: "https://example.com/notebook.png",
+            },
+          ],
+          totalItems: 1,
+          totalPages: 1,
+          page: 1,
+          limit: 10,
+        },
+      };
+    });
+
     render(<App />);
 
-    const counterButton = screen.getByRole('button', { name: /Count is 0/i });
-    expect(counterButton).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", {
+        name: /Marketplace Aggregator/i,
+      }),
+    ).toBeInTheDocument();
 
-    await userEvent.click(counterButton);
-    expect(screen.getByRole('button', { name: /Count is 1/i })).toBeInTheDocument();
+    expect(await screen.findByText("Notebook Pro")).toBeInTheDocument();
   });
 });
