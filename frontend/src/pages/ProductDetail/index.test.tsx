@@ -47,15 +47,15 @@ describe("ProductDetail page", () => {
     );
 
     expect(screen.getByText("Notebook Pro")).toBeInTheDocument();
-    expect(screen.getByText("Histórico de preços")).toBeInTheDocument();
-    expect(screen.getByText("01/06/2026")).toBeInTheDocument();
+    expect(screen.getByText("Price history")).toBeInTheDocument();
+    expect(screen.getByText("2026-06-01")).toBeInTheDocument();
     expect(screen.getByText("R$ 4.899,00")).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "Compra indisponível" }),
+      screen.getByRole("button", { name: "Purchase unavailable" }),
     ).toBeDisabled();
 
     await user.click(
-      screen.getByRole("button", { name: "Adicionar à Comparação" }),
+      screen.getByRole("button", { name: "Add to comparison" }),
     );
     expect(addProduct).toHaveBeenCalledTimes(1);
   });
@@ -96,7 +96,7 @@ describe("ProductDetail page", () => {
     );
 
     await user.click(
-      screen.getByRole("button", { name: "Remover da Comparação" }),
+      screen.getByRole("button", { name: "Remove from comparison" }),
     );
 
     expect(removeProduct).toHaveBeenCalledWith(product.id);

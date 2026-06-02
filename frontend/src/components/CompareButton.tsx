@@ -59,10 +59,10 @@ export function CompareButton() {
           {isComparePage ? <CloseIcon sx={{ fontSize: 22 }} /> : <CompareIcon sx={{ fontSize: 22 }} />}
           <Box sx={{ textAlign: "left" }}>
             <Typography variant="button" sx={{ color: "common.white", fontWeight: 700, display: "block" }}>
-              {isComparePage ? "Fechar comparação" : "Abrir comparação"}
+              {isComparePage ? "Close comparison" : "Open comparison"}
             </Typography>
             <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.92)", display: "block" }}>
-              {selectedProducts.length} produtos selecionados
+              {selectedProducts.length} products selected
             </Typography>
           </Box>
         </Box>

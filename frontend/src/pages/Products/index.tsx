@@ -71,7 +71,7 @@ export function Products() {
         <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
           <FilterAltOutlinedIcon color="primary" fontSize="small" />
           <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-            Filtros
+            Filters
           </Typography>
         </Box>
 
@@ -89,8 +89,8 @@ export function Products() {
         >
           <TextField
             fullWidth
-            label="Buscar produto"
-            placeholder="Ex: smartphone, geladeira, tênis"
+            label="Search products"
+            placeholder="Ex: smartphone, refrigerator, sneakers"
             value={search}
             slotProps={{
               input: {
@@ -109,17 +109,17 @@ export function Products() {
           />
 
           <FormControl fullWidth size="small" sx={{ minWidth: 120 }}>
-            <InputLabel id="category-label">Categoria</InputLabel>
+            <InputLabel id="category-label">Category</InputLabel>
             <Select
               labelId="category-label"
               value={category}
-              label="Categoria"
+              label="Category"
               onChange={(event) => {
                 setCategory(event.target.value as string);
                 setPage(1);
               }}
             >
-              <MenuItem value="">Todas</MenuItem>
+              <MenuItem value="">All</MenuItem>
               {categories?.map((categoryItem) => (
                 <MenuItem key={categoryItem} value={categoryItem}>
                   {categoryItem}
@@ -131,7 +131,7 @@ export function Products() {
           <TextField
             fullWidth
             type="number"
-            label="Preço mínimo"
+            label="Minimum price"
             placeholder="R$ 0"
             value={minPrice}
             onChange={(event) => {
@@ -145,7 +145,7 @@ export function Products() {
           <TextField
             fullWidth
             type="number"
-            label="Preço máximo"
+            label="Maximum price"
             placeholder="R$ 0"
             value={maxPrice}
             onChange={(event) => {
@@ -171,12 +171,12 @@ export function Products() {
             }}
           >
             <Typography variant="caption" color="text.secondary" sx={{ mr: 0.5 }}>
-              Ativos:
+              Active:
             </Typography>
-            {search && <Chip size="medium" label={`Busca: ${search}`} onDelete={() => setSearch("")} />}
-            {category && <Chip size="small" label={`Categoria: ${category}`} onDelete={() => setCategory("")} />}
-            {minPrice !== "" && <Chip size="small" label={`Mínimo: R$ ${minPrice}`} onDelete={() => setMinPrice("")} />}
-            {maxPrice !== "" && <Chip size="small" label={`Máximo: R$ ${maxPrice}`} onDelete={() => setMaxPrice("")} />}
+            {search && <Chip size="medium" label={`Search: ${search}`} onDelete={() => setSearch("")} />}
+            {category && <Chip size="small" label={`Category: ${category}`} onDelete={() => setCategory("")} />}
+            {minPrice !== "" && <Chip size="small" label={`Minimum: R$ ${minPrice}`} onDelete={() => setMinPrice("")} />}
+            {maxPrice !== "" && <Chip size="small" label={`Maximum: R$ ${maxPrice}`} onDelete={() => setMaxPrice("")} />}
 
             <Button
               size="small"
@@ -184,7 +184,7 @@ export function Products() {
               onClick={clearFilters}
               sx={{ ml: { sm: "auto" }, whiteSpace: "nowrap" }}
             >
-              Limpar
+              Clear
             </Button>
           </Box>
         )}
@@ -208,16 +208,16 @@ export function Products() {
           severity="error"
           action={
             <Button color="inherit" size="small" onClick={() => refetch()}>
-              Tentar novamente
+              Try again
             </Button>
           }
         >
-          Não foi possível carregar os produtos. Verifique sua conexão e tente novamente.
+          Unable to load products. Check your connection and try again.
         </Alert>
       ) : data?.data.length === 0 ? (
         <Box sx={{ mt: 4, textAlign: "center" }}>
           <Typography variant="h6" color="text.secondary">
-            Nenhum produto encontrado.
+            No products found.
           </Typography>
         </Box>
       ) : (

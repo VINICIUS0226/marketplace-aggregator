@@ -30,18 +30,18 @@ export function Compare() {
             onClick={() => navigate(-1)}
             variant="outlined"
           >
-            Voltar
+            Back
           </Button>
 
           <Typography variant="h4" gutterBottom sx={{ fontWeight: 700, mb: 0 }}>
-            Comparação de Produtos
+            Product Comparison
           </Typography>
         </Box>
       </Box>
 
       {selectedProducts.length < 2 ? (
         <Typography sx={{ mt: 2 }}>
-          Selecione ao menos dois produtos para ver a comparação.
+          Select at least two products to view the comparison.
         </Typography>
       ) : (
         <Paper sx={{ p: 2, borderRadius: 2, border: "1px solid", borderColor: "divider" }}>
@@ -50,7 +50,7 @@ export function Compare() {
             <TableHead>
               <TableRow>
                 <TableCell sx={{ fontWeight: 700, borderBottom: "2px solid", borderColor: "divider", width: 180 }}>
-                  Atributo
+                  Attribute
                 </TableCell>
 
                 {selectedProducts.map((product) => (
@@ -76,7 +76,7 @@ export function Compare() {
 
             <TableBody>
               <TableRow sx={{ bgcolor: "background.default" }}>
-                <TableCell sx={{ fontWeight: 700, py: 2 }}>Imagem</TableCell>
+                <TableCell sx={{ fontWeight: 700, py: 2 }}>Image</TableCell>
 
                 {selectedProducts.map((product) => (
                   <TableCell key={product.id} sx={{ textAlign: "center", py: 2 }}>
@@ -92,7 +92,7 @@ export function Compare() {
               </TableRow>
 
               <TableRow>
-                <TableCell sx={{ fontWeight: 700, py: 2 }}>Preço</TableCell>
+                <TableCell sx={{ fontWeight: 700, py: 2 }}>Price</TableCell>
 
                 {selectedProducts.map((product) => (
                   <TableCell key={product.id} sx={{ textAlign: "center", py: 2 }}>
@@ -104,7 +104,7 @@ export function Compare() {
               </TableRow>
 
               <TableRow sx={{ bgcolor: "background.default" }}>
-                <TableCell sx={{ fontWeight: 700, py: 2 }}>Categoria</TableCell>
+                <TableCell sx={{ fontWeight: 700, py: 2 }}>Category</TableCell>
 
                 {selectedProducts.map((product) => (
                   <TableCell key={product.id} sx={{ textAlign: "center", py: 2 }}>
@@ -126,7 +126,7 @@ export function Compare() {
               </TableRow>
 
               <TableRow sx={{ bgcolor: "background.default" }}>
-                <TableCell sx={{ fontWeight: 700, py: 2 }}>Estoque</TableCell>
+                <TableCell sx={{ fontWeight: 700, py: 2 }}>Stock</TableCell>
 
                 {selectedProducts.map((product) => (
                   <TableCell key={product.id} sx={{ textAlign: "center", py: 2 }}>

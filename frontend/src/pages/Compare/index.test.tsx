@@ -54,7 +54,7 @@ describe("Compare page", () => {
     renderCompare([products[0]]);
 
     expect(
-      screen.getByText(/Selecione ao menos dois produtos/i),
+      screen.getByText(/Select at least two products/i),
     ).toBeInTheDocument();
   });
 

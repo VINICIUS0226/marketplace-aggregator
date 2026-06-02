@@ -5,7 +5,7 @@ test('should load product list page', async ({ page }) => {
 
   await expect(page.getByText('Marketplace Aggregator')).toBeVisible();
 
-  const detailItems = page.getByText('Ver Detalhes');
+  const detailItems = page.getByText('View details');
   await expect(detailItems.first()).toBeVisible();
   expect(await detailItems.count()).toBeGreaterThan(0);
 });
@@ -13,12 +13,12 @@ test('should load product list page', async ({ page }) => {
 test('should navigate to product detail page', async ({ page }) => {
   await page.goto('/');
 
-  const firstDetailLink = page.getByText('Ver Detalhes').first();
+  const firstDetailLink = page.getByText('View details').first();
   await expect(firstDetailLink).toBeVisible();
 
   await firstDetailLink.click();
   await expect(page).toHaveURL(/\/products\/\d+/);
-  await expect(page.getByText('Voltar')).toBeVisible();
+  await expect(page.getByText('Back')).toBeVisible();
 });
 
 test('should compare two selected products', async ({ page }) => {
@@ -30,12 +30,12 @@ test('should compare two selected products', async ({ page }) => {
   await checkboxes.nth(0).check();
   await checkboxes.nth(1).check();
 
-  await page.getByRole('button', { name: /Abrir comparação/i }).click();
+  await page.getByRole('button', { name: /Open comparison/i }).click();
 
   await expect(page).toHaveURL(/\/compare$/);
-  await expect(page.getByText('Comparação de Produtos')).toBeVisible();
-  await expect(page.getByText('Preço')).toBeVisible();
-  await expect(page.getByText('Estoque')).toBeVisible();
+  await expect(page.getByText('Product Comparison')).toBeVisible();
+  await expect(page.getByText('Price')).toBeVisible();
+  await expect(page.getByText('Stock')).toBeVisible();
 });
 
 test('should protect cache refresh with JWT authentication', async ({ request }) => {

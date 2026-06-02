@@ -22,7 +22,6 @@ import { useState } from "react";
 import { useProduct } from "../../hooks/useProduct";
 import { useCompare } from "../../contexts/compareStore";
 import { formatCurrency } from "../../utils/currency";
-import { formatDate } from "../../utils/date";
 
 export function ProductDetail() {
   const { id } = useParams();
@@ -52,11 +51,11 @@ export function ProductDetail() {
           variant="text"
           sx={{ mb: 2 }}
         >
-          Voltar
+          Back
         </Button>
         <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 3 }}>
           <Typography color="error">
-            Erro ao carregar o produto. Tente novamente.
+            Unable to load the product. Please try again.
           </Typography>
         </Paper>
       </Container>
@@ -75,7 +74,7 @@ export function ProductDetail() {
         variant="text"
         sx={{ mb: 2 }}
       >
-        Voltar
+        Back
       </Button>
 
       <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 3 }}>
@@ -100,7 +99,7 @@ export function ProductDetail() {
             <Stack direction="row" spacing={1} sx={{ mb: 2, alignItems: "center" }}>
               <Chip label={data.category} />
               <Rating value={data.rating} readOnly precision={0.1} />
-              <Chip label={`Estoque: ${data.stock}`} color={data.stock > 0 ? "success" : "default"} sx={{ ml: "auto" }} />
+              <Chip label={`Stock: ${data.stock}`} color={data.stock > 0 ? "success" : "default"} sx={{ ml: "auto" }} />
             </Stack>
 
             <Typography variant="h5" color="primary" sx={{ mb: 2 }}>
@@ -113,7 +112,7 @@ export function ProductDetail() {
 
             <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
               <Button variant="contained" size="large" disabled>
-                Compra indisponível
+                Purchase unavailable
               </Button>
               <Button
                 variant={productIsSelected ? "contained" : "outlined"}
@@ -127,7 +126,7 @@ export function ProductDetail() {
                   }
                 }}
               >
-                {productIsSelected ? "Remover da Comparação" : "Adicionar à Comparação"}
+                {productIsSelected ? "Remove from comparison" : "Add to comparison"}
               </Button>
             </Stack>
           </Grid>
@@ -137,7 +136,7 @@ export function ProductDetail() {
       {data.priceHistory && data.priceHistory.length > 0 && (
         <Paper sx={{ p: 3, mt: 3, borderRadius: 2, boxShadow: 2 }}>
           <Typography variant="h6" sx={{ mb: 2, fontWeight: 700 }}>
-            Histórico de preços
+            Price history
           </Typography>
 
           {/* A lista compacta evidencia variação temporal sem introduzir uma biblioteca de gráficos. */}
@@ -154,7 +153,7 @@ export function ProductDetail() {
                 }}
               >
                 <Typography variant="caption" color="text.secondary">
-                  {formatDate(item.date)}
+                  {item.date}
                 </Typography>
                 <Typography variant="body1" sx={{ fontWeight: 700 }}>
                   {formatCurrency(item.price)}

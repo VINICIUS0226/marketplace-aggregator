@@ -11,11 +11,11 @@ export function NotFound() {
         404
       </Typography>
       <Typography variant="h5" color="text.secondary">
-        Página não encontrada
+        Page not found
       </Typography>
       <Box sx={{ mt: 3 }}>
         <Typography color="text.secondary">
-          Verifique a URL ou volte para a página inicial.
+          Check the URL or return to the home page.
         </Typography>
       </Box>
     </Container>

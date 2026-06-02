@@ -403,7 +403,7 @@ docker compose up -d --build
 Resultados observados:
 
 - `32/32` testes automatizados do backend aprovados.
-- `16/16` testes unitários e de componente do frontend aprovados.
+- `15/15` testes unitários e de componente do frontend aprovados.
 - `6/6` testes E2E aprovados: listagem, detalhe, comparação, autenticação, fallback resiliente e geração das evidências visuais.
 - Build do frontend aprovado.
 - Cobertura mínima protegida por thresholds no Jest e Vitest.

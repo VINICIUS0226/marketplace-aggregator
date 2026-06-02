@@ -41,7 +41,7 @@ describe("CompareButton", () => {
     );
 
     expect(
-      screen.queryByRole("button", { name: /Abrir comparação/i }),
+      screen.queryByRole("button", { name: /Open comparison/i }),
     ).not.toBeInTheDocument();
   });
 
@@ -64,7 +64,7 @@ describe("CompareButton", () => {
     );
 
     await user.click(
-      screen.getByRole("button", { name: /Abrir comparação/i }),
+      screen.getByRole("button", { name: /Open comparison/i }),
     );
     expect(screen.getByText("/compare")).toBeInTheDocument();
 
@@ -77,7 +77,7 @@ describe("CompareButton", () => {
     );
 
     await user.click(
-      screen.getByRole("button", { name: /Fechar comparação/i }),
+      screen.getByRole("button", { name: /Close comparison/i }),
     );
     expect(clearProducts).toHaveBeenCalledTimes(1);
   });

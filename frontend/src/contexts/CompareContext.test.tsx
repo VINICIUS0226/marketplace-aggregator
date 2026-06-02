@@ -29,10 +29,10 @@ function CompareProbe() {
 
   return (
     <>
-      <span>Selecionados: {selectedProducts.length}</span>
-      <button onClick={() => addProduct(product)}>Adicionar</button>
-      <button onClick={() => removeProduct(product.id)}>Remover</button>
-      <button onClick={clearProducts}>Limpar</button>
+      <span>Selected: {selectedProducts.length}</span>
+      <button onClick={() => addProduct(product)}>Add</button>
+      <button onClick={() => removeProduct(product.id)}>Remove</button>
+      <button onClick={clearProducts}>Clear</button>
     </>
   );
 }
@@ -47,15 +47,15 @@ describe("CompareProvider", () => {
       </CompareProvider>,
     );
 
-    await user.click(screen.getByRole("button", { name: "Adicionar" }));
-    await user.click(screen.getByRole("button", { name: "Adicionar" }));
-    expect(screen.getByText("Selecionados: 1")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Add" }));
+    await user.click(screen.getByRole("button", { name: "Add" }));
+    expect(screen.getByText("Selected: 1")).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Remover" }));
-    expect(screen.getByText("Selecionados: 0")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Remove" }));
+    expect(screen.getByText("Selected: 0")).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Adicionar" }));
-    await user.click(screen.getByRole("button", { name: "Limpar" }));
-    expect(screen.getByText("Selecionados: 0")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Add" }));
+    await user.click(screen.getByRole("button", { name: "Clear" }));
+    expect(screen.getByText("Selected: 0")).toBeInTheDocument();
   });
 });

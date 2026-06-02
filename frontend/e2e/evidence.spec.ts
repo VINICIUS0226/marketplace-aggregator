@@ -12,23 +12,23 @@ async function waitForLoadedImages(page: Page) {
 test('captures project evidence screenshots', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByText('Marketplace Aggregator')).toBeVisible();
-  await expect(page.getByText('Ver Detalhes').first()).toBeVisible();
+  await expect(page.getByText('View details').first()).toBeVisible();
   await waitForLoadedImages(page);
   await page.screenshot({ path: '../docs/products.png', fullPage: true });
 
-  await page.getByText('Ver Detalhes').first().click();
-  await expect(page.getByText('Histórico de preços')).toBeVisible();
+  await page.getByText('View details').first().click();
+  await expect(page.getByText('Price history')).toBeVisible();
   await waitForLoadedImages(page);
   await page.screenshot({ path: '../docs/product-detail.png', fullPage: true });
 
   await page.goto('/');
-  await expect(page.getByText('Ver Detalhes').first()).toBeVisible();
+  await expect(page.getByText('View details').first()).toBeVisible();
   await waitForLoadedImages(page);
   const checkboxes = page.getByRole('checkbox');
   await checkboxes.nth(0).check();
   await checkboxes.nth(1).check();
-  await page.getByRole('button', { name: /Abrir comparação/i }).click();
-  await expect(page.getByText('Comparação de Produtos')).toBeVisible();
+  await page.getByRole('button', { name: /Open comparison/i }).click();
+  await expect(page.getByText('Product Comparison')).toBeVisible();
   await waitForLoadedImages(page);
   await page.screenshot({ path: '../docs/comparison.png', fullPage: true });
 

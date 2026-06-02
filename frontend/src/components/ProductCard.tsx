@@ -103,7 +103,7 @@ export function ProductCard({ product }: Props) {
             fullWidth
             size="small"
           >
-            Ver Detalhes
+            View details
           </Button>
         </Box>
       </CardActions>

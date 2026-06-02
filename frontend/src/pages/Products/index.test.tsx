@@ -44,11 +44,11 @@ describe("Products page", () => {
     );
 
     expect(
-      screen.getByText(/Não foi possível carregar os produtos/i),
+      screen.getByText(/Unable to load products/i),
     ).toBeInTheDocument();
 
     await user.click(
-      screen.getByRole("button", { name: "Tentar novamente" }),
+      screen.getByRole("button", { name: "Try again" }),
     );
 
     expect(refetch).toHaveBeenCalledTimes(1);
@@ -77,11 +77,11 @@ describe("Products page", () => {
     );
 
     await user.type(
-      screen.getByRole("textbox", { name: "Buscar produto" }),
+      screen.getByRole("textbox", { name: "Search products" }),
       "notebook",
     );
     await user.type(
-      screen.getByRole("spinbutton", { name: "Preço mínimo" }),
+      screen.getByRole("spinbutton", { name: "Minimum price" }),
       "1000",
     );
 
