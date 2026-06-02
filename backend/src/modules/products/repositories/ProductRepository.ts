@@ -17,6 +17,26 @@ const PRODUCTS_API_URL =
  */
 const PRODUCTS_CACHE_KEY = "products";
 
+function isExternalProduct(product: unknown): product is Product {
+  if (!product || typeof product !== "object") {
+    return false;
+  }
+
+  const candidate = product as Partial<Product>;
+
+  return (
+    typeof candidate.id === "number" &&
+    typeof candidate.title === "string" &&
+    typeof candidate.description === "string" &&
+    typeof candidate.category === "string" &&
+    typeof candidate.price === "number" &&
+    typeof candidate.rating === "number" &&
+    typeof candidate.stock === "number" &&
+    typeof candidate.thumbnail === "string" &&
+    Array.isArray(candidate.images)
+  );
+}
+
 /**
  * Repository responsável pela integração com a fonte externa de produtos.
  *
@@ -24,6 +44,8 @@ const PRODUCTS_CACHE_KEY = "products";
  * banco ou outra API, service/controller continuam preservados.
  */
 export class ProductRepository {
+  private staleProducts: Product[] | null = null;
+
   /**
    * Cria um histórico sintético de preço para demonstrar o diferencial pedido
    * no case sem introduzir persistência fora do escopo obrigatório.
@@ -71,6 +93,7 @@ export class ProductRepository {
       cache.get<Product[]>(PRODUCTS_CACHE_KEY);
 
     if (cachedProducts) {
+      this.staleProducts = cachedProducts;
       return cachedProducts;
     }
 
@@ -78,6 +101,13 @@ export class ProductRepository {
       const response = await axios.get(PRODUCTS_API_URL, {
         timeout: 15000,
       });
+
+      if (
+        !Array.isArray(response.data?.products) ||
+        !response.data.products.every(isExternalProduct)
+      ) {
+        throw new Error("External provider returned an invalid payload.");
+      }
 
       const products: Product[] = response.data.products.map(
         (product: Product) => ({
@@ -87,6 +117,7 @@ export class ProductRepository {
       );
 
       cache.set(PRODUCTS_CACHE_KEY, products);
+      this.staleProducts = products;
 
       return products;
     } catch (error) {
@@ -97,6 +128,12 @@ export class ProductRepository {
       console.error(
         `[ProductRepository] Failed to fetch products: ${errorMessage}`,
       );
+
+      // Em caso de indisponibilidade temporária, prioriza continuidade de
+      // leitura com o último snapshot válido conhecido por esta instância.
+      if (this.staleProducts) {
+        return this.staleProducts;
+      }
 
       throw new Error(
         "Failed to retrieve products from external provider.",

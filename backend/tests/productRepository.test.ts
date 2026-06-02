@@ -67,4 +67,26 @@ describe('ProductRepository', () => {
       'Failed to retrieve products from external provider.',
     );
   });
+
+  it('returns the last valid snapshot when the provider becomes unavailable', async () => {
+    mockedAxios.get.mockResolvedValueOnce({ data: { products: exampleProducts } });
+
+    const repository = new ProductRepository();
+    const products = await repository.getAllProducts();
+
+    cache.del('products');
+    mockedAxios.get.mockRejectedValueOnce(new Error('Network failure'));
+
+    await expect(repository.getAllProducts()).resolves.toEqual(products);
+  });
+
+  it('rejects invalid external payloads when no snapshot is available', async () => {
+    mockedAxios.get.mockResolvedValueOnce({ data: { products: [{ id: 1 }] } });
+
+    const repository = new ProductRepository();
+
+    await expect(repository.getAllProducts()).rejects.toThrow(
+      'Failed to retrieve products from external provider.',
+    );
+  });
 });
