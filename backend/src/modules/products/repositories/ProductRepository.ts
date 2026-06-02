@@ -10,6 +10,7 @@ import { cache } from "../../../shared/config/cache";
  * memória e deixa a camada de serviço responsável pela paginação da API local.
  */
 const PRODUCTS_API_URL =
+  process.env.PRODUCTS_API_URL ||
   "https://dummyjson.com/products?limit=100";
 
 /**

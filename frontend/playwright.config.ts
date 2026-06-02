@@ -21,6 +21,18 @@ export default defineConfig({
   },
   webServer: [
     {
+      command: 'node e2e/fixtures/mock-provider.mjs',
+      port: 3101,
+      reuseExistingServer: !process.env.CI,
+      timeout: 120 * 1000,
+    },
+    {
+      command: 'node e2e/fixtures/start-resilience-backend.mjs',
+      port: 3001,
+      reuseExistingServer: !process.env.CI,
+      timeout: 120 * 1000,
+    },
+    {
       command: 'cd ../backend && npm run dev',
       port: 3000,
       reuseExistingServer: !process.env.CI,
