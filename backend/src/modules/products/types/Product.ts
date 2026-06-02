@@ -1,52 +1,26 @@
 /**
- * Entidade de produto utilizada pela aplicação.
+ * Contrato interno de produto.
  *
- * Fonte de dados:
- * https://dummyjson.com/products
+ * Ele deriva da DummyJSON, mas é tratado como modelo da aplicação para evitar
+ * espalhar detalhes da fonte externa pelas camadas de serviço e frontend.
  */
 export interface Product {
-  /**
-   * Identificador único do produto.
-   */
   id: number;
-
-  /**
-   * Nome do produto.
-   */
   title: string;
-
-  /**
-   * Descrição detalhada.
-   */
   description: string;
-
-  /**
-   * Categoria do produto.
-   */
   category: string;
-
-  /**
-   * Preço atual.
-   */
   price: number;
-
-  /**
-   * Avaliação média dos usuários.
-   */
   rating: number;
-
-  /**
-   * Quantidade disponível em estoque.
-   */
   stock: number;
-
-  /**
-   * URL da imagem principal.
-   */
   thumbnail: string;
+  images: string[];
 
   /**
-   * Galeria de imagens do produto.
+   * Histórico sintético usado para cumprir o diferencial de variação de preço
+   * sem adicionar persistência ao escopo obrigatório.
    */
-  images: string[];
+  priceHistory: Array<{
+    date: string;
+    price: number;
+  }>;
 }

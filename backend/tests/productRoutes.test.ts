@@ -94,4 +94,58 @@ describe('Products API', () => {
     expect(response.status).toBe(400);
     expect(response.body).toHaveProperty('message');
   });
+
+  it('should return 400 when compare ids contains a non-numeric value', async () => {
+    const response = await request(app)
+      .post('/products/compare')
+      .send({ ids: [1, 'invalid'] });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty('message');
+  });
+
+  it('should login and return a JWT token', async () => {
+    const response = await request(app)
+      .post('/auth/login')
+      .send({ username: 'admin', password: 'admin123' });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('token');
+  });
+
+  it('should fail login with invalid credentials', async () => {
+    const response = await request(app)
+      .post('/auth/login')
+      .send({ username: 'admin', password: 'wrongpass' });
+
+    expect(response.status).toBe(401);
+    expect(response.body).toHaveProperty('message');
+  });
+
+  it('should refresh product cache when authorized', async () => {
+    const loginResponse = await request(app)
+      .post('/auth/login')
+      .send({ username: 'admin', password: 'admin123' });
+
+    const token = loginResponse.body.token;
+
+    jest
+      .spyOn(ProductRepository.prototype, 'refreshProducts')
+      .mockResolvedValue(mockedProducts as any);
+
+    const response = await request(app)
+      .post('/products/refresh-cache')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('message');
+    expect(response.body).toHaveProperty('totalItems', mockedProducts.length);
+  });
+
+  it('should return 401 for refresh cache without token', async () => {
+    const response = await request(app).post('/products/refresh-cache');
+
+    expect(response.status).toBe(401);
+    expect(response.body).toHaveProperty('message');
+  });
 });

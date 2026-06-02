@@ -17,6 +17,7 @@ const exampleProducts = [
     stock: 10,
     thumbnail: 'test.png',
     images: ['test.png'],
+    priceHistory: [],
   },
 ];
 
@@ -31,9 +32,20 @@ describe('ProductRepository', () => {
     const repository = new ProductRepository();
     const products = await repository.getAllProducts();
 
-    expect(products).toEqual(exampleProducts);
+    expect(products[0]).toEqual(
+      expect.objectContaining({
+        ...exampleProducts[0],
+        priceHistory: expect.any(Array),
+      }),
+    );
+    expect(products[0].priceHistory).toHaveLength(5);
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-    expect(cache.get('products')).toEqual(exampleProducts);
+    expect((cache.get('products') as any)[0]).toEqual(
+      expect.objectContaining({
+        ...exampleProducts[0],
+        priceHistory: expect.any(Array),
+      }),
+    );
   });
 
   it('returns cached products when available', async () => {

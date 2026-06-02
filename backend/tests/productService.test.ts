@@ -13,6 +13,13 @@ const mockedProducts: Product[] = [
     stock: 12,
     thumbnail: 'phone.png',
     images: ['phone.png'],
+    priceHistory: [
+      { date: '2026-05-28', price: 290 },
+      { date: '2026-05-29', price: 295 },
+      { date: '2026-05-30', price: 300 },
+      { date: '2026-05-31', price: 305 },
+      { date: '2026-06-01', price: 310 },
+    ],
   },
   {
     id: 2,
@@ -24,6 +31,13 @@ const mockedProducts: Product[] = [
     stock: 50,
     thumbnail: 'mug.png',
     images: ['mug.png'],
+    priceHistory: [
+      { date: '2026-05-28', price: 23 },
+      { date: '2026-05-29', price: 24 },
+      { date: '2026-05-30', price: 25 },
+      { date: '2026-05-31', price: 26 },
+      { date: '2026-06-01', price: 27 },
+    ],
   },
 ];
 

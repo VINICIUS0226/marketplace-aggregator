@@ -2,15 +2,14 @@ import { Router } from "express";
 
 import { ProductController } from "../controllers/ProductController";
 import { asyncHandler } from "../../../shared/utils/asyncHandler";
+import { authenticateToken } from "../../../shared/middlewares/auth";
 
 /**
- * Router responsável pelas operações relacionadas aos produtos.
+ * Rotas HTTP do domínio de produtos.
+ *
+ * asyncHandler encaminha rejeições assíncronas ao middleware global de erros.
  */
 const productsRouter = Router();
-
-/**
- * Controller de produtos.
- */
 const productController = new ProductController();
 
 /**
@@ -37,7 +36,7 @@ const productController = new ProductController();
  *         name: search
  *         schema:
  *           type: string
- *         description: Busca por nome ou descrição
+ *         description: Busca por nome, descrição ou categoria
  *       - in: query
  *         name: minPrice
  *         schema:
@@ -64,7 +63,7 @@ const productController = new ProductController();
  */
 productsRouter.get(
   "/",
-  asyncHandler(productController.list.bind(productController))
+  asyncHandler(productController.list.bind(productController)),
 );
 
 /**
@@ -113,7 +112,28 @@ productsRouter.get(
  */
 productsRouter.post(
   "/compare",
-  asyncHandler(productController.compare.bind(productController))
+  asyncHandler(productController.compare.bind(productController)),
+);
+
+/**
+ * @swagger
+ * /products/refresh-cache:
+ *   post:
+ *     summary: Atualiza o cache de produtos
+ *     description: Recarrega os dados a partir da fonte externa e atualiza o cache.
+ *     tags: [Products]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Cache atualizado com sucesso.
+ *       401:
+ *         description: Token inválido ou ausente.
+ */
+productsRouter.post(
+  "/refresh-cache",
+  authenticateToken,
+  asyncHandler(productController.refresh.bind(productController)),
 );
 
 /**
@@ -138,7 +158,7 @@ productsRouter.post(
  */
 productsRouter.get(
   "/:id",
-  asyncHandler(productController.show.bind(productController))
+  asyncHandler(productController.show.bind(productController)),
 );
 
 export default productsRouter;

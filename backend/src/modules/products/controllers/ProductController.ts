@@ -2,7 +2,10 @@ import { Request, Response } from "express";
 import { ProductService } from "../services/ProductService";
 
 /**
- * Controller responsável pelas operações relacionadas aos produtos.
+ * Controller HTTP de produtos.
+ *
+ * Mantém a responsabilidade limitada a entrada/saída HTTP. Regras como
+ * filtragem, comparação e refresh de cache ficam em ProductService.
  */
 export class ProductController {
   private readonly productService: ProductService;
@@ -12,23 +15,11 @@ export class ProductController {
   }
 
   /**
-   * Lista produtos com suporte a filtros, busca e paginação.
-   *
-   * Query Params:
-   * - category: Filtra por categoria.
-   * - search: Busca por nome ou descrição.
-   * - minPrice: Preço mínimo.
-   * - maxPrice: Preço máximo.
-   * - page: Página atual.
-   * - limit: Quantidade de itens por página.
-   *
-   * @param request Requisição HTTP
-   * @param response Resposta HTTP
-   * @returns Lista paginada de produtos
+   * Lista produtos com suporte a filtros combináveis e paginação.
    */
   public async list(
     request: Request,
-    response: Response
+    response: Response,
   ): Promise<Response> {
     const products = await this.productService.listProducts({
       category: request.query.category as string,
@@ -44,14 +35,10 @@ export class ProductController {
 
   /**
    * Retorna os detalhes de um produto específico.
-   *
-   * @param request Requisição contendo o ID do produto na URL
-   * @param response Resposta HTTP
-   * @returns Dados completos do produto
    */
   public async show(
     request: Request,
-    response: Response
+    response: Response,
   ): Promise<Response> {
     const id = Number(request.params.id);
 
@@ -63,24 +50,23 @@ export class ProductController {
   /**
    * Compara múltiplos produtos a partir de uma lista de IDs.
    *
-   * Exemplo:
-   * {
-   *   "ids": [1, 2, 3]
-   * }
-   *
-   * @param request Requisição contendo um array de IDs
-   * @param response Resposta HTTP
-   * @returns Lista dos produtos encontrados
+   * A validação mínima fica aqui por estar ligada ao contrato HTTP do body.
    */
   public async compare(
     request: Request,
-    response: Response
+    response: Response,
   ): Promise<Response> {
     const { ids } = request.body;
 
     if (!Array.isArray(ids) || ids.length === 0) {
       return response.status(400).json({
         message: "The ids field must be a non-empty array.",
+      });
+    }
+
+    if (ids.some((id) => typeof id !== "number" || Number.isNaN(id))) {
+      return response.status(400).json({
+        message: "All ids must be valid numbers.",
       });
     }
 
@@ -93,12 +79,29 @@ export class ProductController {
    * Retorna a lista de categorias disponíveis.
    */
   public async categories(
-    request: Request,
+    _request: Request,
     response: Response,
   ): Promise<Response> {
     const categories =
       await this.productService.getCategories();
 
     return response.status(200).json(categories);
+  }
+
+  /**
+   * Recarrega o cache de produtos.
+   *
+   * A autenticação é aplicada na rota; aqui apenas executamos a ação de domínio.
+   */
+  public async refresh(
+    _request: Request,
+    response: Response,
+  ): Promise<Response> {
+    const products = await this.productService.refreshProducts();
+
+    return response.status(200).json({
+      message: "Product cache refreshed successfully.",
+      totalItems: products.length,
+    });
   }
 }

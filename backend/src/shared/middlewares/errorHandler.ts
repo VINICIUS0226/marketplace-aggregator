@@ -7,12 +7,10 @@ import {
 import { AppError } from "../errors/AppError";
 
 /**
- * Middleware global responsável pelo tratamento
- * de erros da aplicação.
+ * Middleware global de erros.
  *
- * Fluxo:
- * - Erros de negócio (AppError)
- * - Erros inesperados (500)
+ * Erros de domínio preservam status e mensagem; erros inesperados são logados
+ * internamente e retornam uma resposta genérica para não expor detalhes.
  */
 export function errorHandler(
   error: Error,
@@ -20,9 +18,6 @@ export function errorHandler(
   response: Response,
   _next: NextFunction,
 ): Response {
-  /**
-   * Erros controlados da aplicação.
-   */
   if (error instanceof AppError) {
     return response.status(error.statusCode).json({
       success: false,
@@ -30,9 +25,6 @@ export function errorHandler(
     });
   }
 
-  /**
-   * Log para análise e troubleshooting.
-   */
   console.error(
     `[${new Date().toISOString()}]`,
     request.method,
@@ -40,9 +32,6 @@ export function errorHandler(
     error,
   );
 
-  /**
-   * Erro interno não tratado.
-   */
   return response.status(500).json({
     success: false,
     message: "Internal Server Error",

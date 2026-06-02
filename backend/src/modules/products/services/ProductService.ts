@@ -3,7 +3,10 @@ import { AppError } from "../../../shared/errors/AppError";
 import { Product } from "../types/Product";
 
 /**
- * Filtros disponíveis para consulta de produtos.
+ * Filtros aceitos pela camada de serviço.
+ *
+ * O controller converte os valores recebidos por query string e esta camada
+ * concentra a regra de negócio aplicada sobre a coleção em memória.
  */
 interface ProductFilters {
   category?: string;
@@ -15,7 +18,7 @@ interface ProductFilters {
 }
 
 /**
- * Estrutura de resposta paginada.
+ * Contrato de resposta usado pela API para paginação.
  */
 interface PaginatedProducts {
   data: Product[];
@@ -26,8 +29,10 @@ interface PaginatedProducts {
 }
 
 /**
- * Serviço responsável pelas regras de negócio
- * relacionadas aos produtos.
+ * Serviço de domínio de produtos.
+ *
+ * Mantém filtros, paginação e comparação fora do controller para que as regras
+ * sejam testáveis e independentes de HTTP.
  */
 export class ProductService {
   constructor(
@@ -35,11 +40,10 @@ export class ProductService {
   ) {}
 
   /**
-   * Lista produtos com suporte a filtros,
-   * busca textual e paginação.
+   * Lista produtos com filtros combináveis e paginação.
    *
-   * @param filters Filtros aplicados à consulta.
-   * @returns Resultado paginado.
+   * A paginação é feita após os filtros para que totalItems e totalPages
+   * reflitam o resultado filtrado, não a coleção completa.
    */
   public async listProducts(
     filters: ProductFilters,
@@ -57,31 +61,28 @@ export class ProductService {
 
     let filteredProducts = [...products];
 
-    /**
-     * Filtra por categoria.
-     */
     if (category) {
       filteredProducts = filteredProducts.filter(
         (product) =>
-          product.category.toLowerCase() ===
-          category.toLowerCase(),
+          product.category.toLowerCase() === category.toLowerCase(),
       );
     }
 
-    /**
-     * Busca por título.
-     */
     if (search) {
       const searchTerm = search.toLowerCase();
 
       filteredProducts = filteredProducts.filter((product) =>
-        product.title.toLowerCase().includes(searchTerm),
+        [
+          product.title,
+          product.description,
+          product.category,
+        ]
+          .join(" ")
+          .toLowerCase()
+          .includes(searchTerm),
       );
     }
 
-    /**
-     * Filtra por preço mínimo.
-     */
     if (
       typeof minPrice === "number" &&
       !Number.isNaN(minPrice)
@@ -91,9 +92,6 @@ export class ProductService {
       );
     }
 
-    /**
-     * Filtra por preço máximo.
-     */
     if (
       typeof maxPrice === "number" &&
       !Number.isNaN(maxPrice)
@@ -103,17 +101,11 @@ export class ProductService {
       );
     }
 
-    const currentPage =
-      page && page > 0 ? page : 1;
+    const currentPage = page && page > 0 ? page : 1;
+    const currentLimit = limit && limit > 0 ? limit : 10;
 
-    const currentLimit =
-      limit && limit > 0 ? limit : 10;
-
-    const startIndex =
-      (currentPage - 1) * currentLimit;
-
-    const endIndex =
-      startIndex + currentLimit;
+    const startIndex = (currentPage - 1) * currentLimit;
+    const endIndex = startIndex + currentLimit;
 
     const paginatedProducts = filteredProducts.slice(
       startIndex,
@@ -132,11 +124,17 @@ export class ProductService {
   }
 
   /**
-   * Busca um produto pelo ID.
+   * Atualiza o cache e força uma nova leitura da fonte externa.
    *
-   * @param id Identificador do produto.
-   * @returns Produto encontrado.
-   * @throws AppError Caso o produto não exista.
+   * A rota que chama este método é protegida por JWT porque altera o estado
+   * operacional da aplicação.
+   */
+  public async refreshProducts(): Promise<Product[]> {
+    return this.productRepository.refreshProducts();
+  }
+
+  /**
+   * Busca um produto pelo ID e transforma ausência em erro de domínio.
    */
   public async getProductById(
     id: number,
@@ -149,21 +147,17 @@ export class ProductService {
     );
 
     if (!product) {
-      throw new AppError(
-        "Product not found",
-        404,
-      );
+      throw new AppError("Product not found", 404);
     }
 
     return product;
   }
 
   /**
-   * Compara múltiplos produtos
-   * utilizando uma lista de IDs.
+   * Retorna os produtos selecionados para comparação.
    *
-   * @param ids Lista de IDs dos produtos.
-   * @returns Produtos encontrados.
+   * IDs duplicados ou inexistentes não geram duplicidade na resposta, pois a
+   * comparação é baseada na coleção canônica carregada pelo repository.
    */
   public async compareProducts(
     ids: number[],
@@ -177,8 +171,7 @@ export class ProductService {
   }
 
   /**
-   * Retorna todas as categorias disponíveis
-   * a partir da lista de produtos.
+   * Retorna as categorias disponíveis a partir dos produtos carregados.
    */
   public async getCategories(): Promise<string[]> {
     const products =

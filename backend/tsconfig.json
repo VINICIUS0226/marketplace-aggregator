@@ -11,6 +11,13 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "skipLibCheck": true,
+    "ignoreDeprecations": "6.0",
     "types": ["node", "jest"]
-  }
+  },
+  "exclude": [
+    "tests",
+    "coverage",
+    "jest.config.ts",
+    "node_modules"
+  ]
 }
