@@ -60,6 +60,10 @@ const productController = new ProductController();
  *     responses:
  *       200:
  *         description: Lista de produtos retornada com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/PaginatedProducts"
  */
 productsRouter.get(
   "/",
@@ -76,6 +80,12 @@ productsRouter.get(
  *     responses:
  *       200:
  *         description: Lista de categorias retornada com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: string
  */
 productsRouter.get(
   "/categories",
@@ -108,8 +118,18 @@ productsRouter.get(
  *     responses:
  *       200:
  *         description: Produtos comparados com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: "#/components/schemas/Product"
  *       400:
  *         description: Lista de IDs inválida.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/ErrorResponse"
  */
 productsRouter.post(
   "/compare",
@@ -128,8 +148,16 @@ productsRouter.post(
  *     responses:
  *       200:
  *         description: Cache atualizado com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/RefreshCacheResponse"
  *       401:
  *         description: Token inválido ou ausente.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/ErrorResponse"
  */
 productsRouter.post(
   "/refresh-cache",
@@ -154,8 +182,16 @@ productsRouter.post(
  *     responses:
  *       200:
  *         description: Produto encontrado.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/Product"
  *       404:
  *         description: Produto não encontrado.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/ErrorResponse"
  */
 productsRouter.get(
   "/:id",

@@ -38,10 +38,22 @@ const authController = new AuthController();
  *     responses:
  *       200:
  *         description: Token gerado com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/LoginResponse"
  *       400:
  *         description: Campos obrigatórios ausentes.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/ErrorResponse"
  *       401:
  *         description: Credenciais inválidas.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/ErrorResponse"
  */
 authRouter.post(
   "/login",
