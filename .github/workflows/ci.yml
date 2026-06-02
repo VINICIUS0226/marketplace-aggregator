@@ -23,6 +23,8 @@ jobs:
         with:
           node-version: '20'
       - run: npm ci
+      - name: Build backend
+        run: npm run build
       - name: Run backend tests with coverage
         run: npm test -- --coverage
       - name: Upload backend coverage
@@ -49,6 +51,8 @@ jobs:
         with:
           node-version: '20'
       - run: npm ci
+      - name: Lint frontend
+        run: npm run lint
       - name: Install backend dependencies for E2E
         run: cd ../backend && npm ci
       - name: Install Playwright browsers

@@ -35,7 +35,7 @@ Core obrigatório:
 - API REST para listar produtos com paginação, filtrar por categoria, faixa de preço e busca textual.
 - Endpoint para obter detalhe de produto.
 - Frontend com listagem, filtros, busca e detalhe.
-- Seleção de 2 ou mais produtos para comparação lado a lado.
+- Seleção de 2 ou mais produtos para comparação lado a lado, revalidada pela API.
 
 Diferenciais implementados:
 
@@ -191,6 +191,9 @@ docker compose -f docker-compose.prod.yml up --build -d
 
 O Nginx está configurado com fallback para `index.html`, permitindo acesso
 direto às rotas do React Router.
+
+O backend possui health check na composição de produção. O Nginx aguarda a API
+ficar saudável antes de iniciar.
 
 Serviços da composição de produção:
 
@@ -422,11 +425,12 @@ docker compose up -d --build
 
 Resultados observados:
 
-- `37/37` testes automatizados do backend aprovados.
-- `20/20` testes unitários e de componente do frontend aprovados.
+- `39/39` testes automatizados do backend aprovados.
+- `24/24` testes unitários e de componente do frontend aprovados.
 - `7/7` testes E2E aprovados: listagem, detalhe, comparação desktop e mobile, autenticação, fallback resiliente e geração das evidências visuais.
 - Build do backend aprovado.
 - Build do frontend aprovado.
+- Lint do frontend aprovado.
 - Cobertura mínima protegida por thresholds no Jest e Vitest.
 - Backend saudável via `GET /health`.
 - Frontend acessível em `http://localhost:5173` com a composição padrão e em `http://localhost` com a composição de produção.
@@ -460,8 +464,10 @@ lsof -i :80 -i :3000 -i :5173
 O workflow em `.github/workflows/ci.yml` executa:
 
 - Instalação de dependências do backend.
+- Build do backend.
 - Testes do backend com coverage.
 - Instalação de dependências do frontend.
+- Lint do frontend.
 - Testes do frontend com coverage.
 - Instalação do Chromium para Playwright.
 - Testes E2E.
@@ -494,8 +500,8 @@ O workflow em `.github/workflows/ci.yml` executa:
 - Respostas padronizadas para erros conhecidos.
 - Logs estruturados em JSON com correlation ID e spans HTTP propagáveis por W3C Trace Context.
 - Métricas operacionais em JSON e formato Prometheus expostas por `GET /metrics` e `GET /metrics/prometheus`.
-- Health check para o Docker Compose.
-- Rate limiting para reduzir abuso de requisições.
+- Health check nas composições Docker.
+- Rate limiting para reduzir abuso de requisições sem afetar endpoints operacionais.
 - Helmet e CORS para proteções HTTP básicas.
 
 ## Trade-offs
