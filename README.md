@@ -17,6 +17,7 @@
 
 - [Visão Geral](#visão-geral)
 - [Objetivos](#objetivos)
+- [Como o desafio foi atendido](#como-o-desafio-foi-atendido)
 - [Arquitetura da Solução](#arquitetura-da-solução)
 - [Tecnologias Utilizadas](#tecnologias-utilizadas)
 - [Fonte de Dados](#fonte-de-dados)
@@ -56,8 +57,6 @@ O projeto foi desenvolvido com foco em:
 - Boas práticas de desenvolvimento
 - Experiência do usuário
 
-O objetivo principal foi simular um cenário próximo ao contexto real de marketplaces, onde produtos oriundos de diferentes fontes precisam ser centralizados para análise e comparação.
-
 ---
 
 # Objetivos
@@ -76,7 +75,40 @@ Este projeto busca demonstrar competências relacionadas a:
 
 ---
 
+# Como o desafio foi atendido
+
+- Ingestão de dados via API externa: `DummyJSON`.
+- Modelagem de produtos em memória, com estrutura coerente de categorias, preço, estoque e atributos de produto.
+- API REST com endpoints para listar produtos, paginar, filtrar por categoria/faixa de preço/busca textual, obter detalhes e comparar produtos.
+- Frontend funcional com tela de listagem, filtros, detalhe do produto e comparação lado a lado.
+- Containerização via Docker e Docker Compose para subir backend e frontend com um único comando.
+- Documentação da API disponível em Swagger.
+- Testes automatizados no backend e frontend.
+
+---
+
 # Arquitetura da Solução
+
+A aplicação foi organizada em camadas com responsabilidades claras para facilitar manutenção, testes e evolução:
+
+- Interface (React + MUI): apresenta os dados e recebe interações do usuário.
+- API (Node + Express): expõe os endpoints REST e coordena chamadas às camadas inferiores.
+- Serviços: aplicam regras de negócio, paginação, filtros e transformações de dados.
+- Repositório: responsável pela integração com a API externa (DummyJSON) e pelo cache em memória.
+
+Essa separação permite testar cada camada isoladamente, trocar a fonte de dados sem impactar a UI e implantar componentes de forma independente.
+
+```text
+UI (React + MUI)
+   ↓ HTTP
+API (Node + Express)
+   ↓
+Serviços (regras de negócio)
+   ↓
+Repositório (integração + cache)
+   ↓
+Fonte externa (DummyJSON)
+```
 
 ```text
 ┌────────────────────────────┐
@@ -151,6 +183,8 @@ A escolha foi realizada considerando:
 - Estrutura consistente
 - Ausência de autenticação
 - Boa variedade de dados
+
+Os dados são recuperados pela API e mantidos em memória no servidor, com cache local para reduzir chamadas externas e melhorar desempenho.
 
 Exemplo de payload:
 
@@ -634,7 +668,7 @@ Considere criar `docker-compose.prod.yml` com serviços otimizados para produç�
 ## Clonar Projeto
 
 ```bash
-git clone <url-do-repositorio>
+git clone https://github.com/VINICIUS0226/marketplace-aggregator.git
 ```
 
 ---
@@ -722,43 +756,16 @@ A pipeline de integração contínua está configurada em `.github/workflows/ci.
 
 # Decisões Arquiteturais
 
-## Por que Express?
+As escolhas técnicas foram feitas visando equilíbrio entre velocidade de entrega e clareza arquitetural, adequadas ao escopo do desafio:
 
-Foi escolhido pela simplicidade, maturidade e produtividade para o escopo do desafio.
+- Express: adotado pela curva de aprendizado reduzida, facilidade de integração com middlewares e boa compatibilidade com TypeScript, permitindo entregar uma API leve e testável rapidamente.
+- React (v18): escolhido pela maturidade do ecossistema, componentização e compatibilidade com bibliotecas que aceleram o desenvolvimento de interfaces.
+- Material UI: fornece componentes prontos e acessíveis, acelerando a construção de uma interface consistente sem sacrificar a personalização.
+- React Query: usado para simplificar o gerenciamento de requisições assíncronas, trazendo cache, revalidação e estados de loading/erro prontos.
+- Context API: suficiente para o estado de seleção de comparação; mantém a stack leve quando o volume de estado não exige uma solução mais complexa.
+- Persistência em memória: optada por reduzir escopo e focar em arquitetura, testes e integração; para um produto em produção recomenda-se uma camada de persistência dedicada.
 
----
-
-## Por que React?
-
-Permite componentização, reutilização e desenvolvimento rápido de interfaces modernas.
-
----
-
-## Por que Material UI?
-
-Permite criar interfaces consistentes e responsivas utilizando componentes amplamente adotados pelo mercado.
-
----
-
-## Por que React Query?
-
-Reduz significativamente a complexidade do gerenciamento de estado assíncrono.
-
----
-
-## Por que Context API?
-
-O volume de estado compartilhado é pequeno e não justifica bibliotecas mais robustas como Redux ou Zustand.
-
----
-
-## Por que não utilizar banco de dados?
-
-O desafio explicitamente permite persistência em memória.
-
-Dessa forma, foi priorizado o foco na arquitetura e organização do código.
-
----
+Essas decisões priorizam produtividade e clareza estrutural, mantendo a aplicação simples de estender.
 
 # Trade-offs Assumidos
 
@@ -774,48 +781,24 @@ Esses itens agregariam complexidade sem impactar diretamente os critérios princ
 
 ---
 
-# Melhorias Futuras
-
-## Backend
-
-- PostgreSQL
-- Prisma ORM
-- Redis
-- JWT
-- Refresh Tokens
-- RabbitMQ
-- OpenTelemetry
-- Logs estruturados
-- CI/CD
-- Testes E2E
-
----
-
-## Frontend
-
-- Zustand
-- React Hook Form
-- Debounce na busca
-- DataGrid Avançado
-- Dark Mode
-- Internacionalização
-
----
-
-## Infraestrutura
-
-- AWS
-- Kubernetes
-- Nginx
-- GitHub Actions
-- Monitoramento
-- Observabilidade
-
----
-
 # Evidências
 
-## Swagger
+Para facilitar a validação funcional e visual do projeto, inclua as capturas abaixo na pasta `/docs` com os nomes sugeridos:
+
+- Swagger UI: inicie o backend e abra `http://localhost:3000/api-docs`. Salve a captura como `/docs/swagger.png`.
+- Lista de produtos: abra o frontend na rota principal (ou `/products`) e salve como `/docs/products.png`.
+- Detalhe de produto: acesse uma página de detalhe e salve como `/docs/product-detail.png`.
+- Tela de comparação: selecione produtos e capture a tela de comparação em `/docs/comparison.png`.
+
+Cobertura de testes:
+
+- Backend (Jest): execute `cd backend && npm test -- --coverage`. Os relatórios ficam em `backend/coverage`.
+- Frontend (Vitest): execute `cd frontend && npm test -- --coverage`. Os relatórios ficam em `frontend/coverage`.
+
+Integração com CI:
+
+- O pipeline atual envia os artefatos de coverage como `backend-coverage` e `frontend-coverage`. Para publicar badge de coverage, integre um serviço como Codecov ou Coveralls e adicione a etapa de upload no workflow.
+
 
 Adicionar screenshot:
 
@@ -857,13 +840,16 @@ Adicionar screenshot:
 
 # Considerações Finais
 
-O foco principal deste projeto foi demonstrar a construção de uma aplicação Fullstack organizada, escalável e alinhada às boas práticas de engenharia de software.
+Este projeto tem como objetivo provar um conjunto de boas práticas em desenvolvimento Fullstack: estrutura por camadas, testes automatizados, documentação e containerização. A solução foi planejada para ser clara e fácil de evoluir — adicionar persistência, autenticação ou pipelines de deploy não exige mudanças drásticas na arquitetura.
 
-Mesmo sem a utilização de persistência relacional, a estrutura foi planejada para permitir evolução futura com baixo acoplamento e mínima necessidade de refatoração.
+Próximos passos recomendados:
 
-A arquitetura adotada busca refletir cenários encontrados em ambientes corporativos reais, priorizando legibilidade, manutenção e extensibilidade.
+- Publicar relatórios de coverage (Codecov/Coveralls) e atualizar o badge no README.
+- Adicionar testes E2E para cobrir fluxos críticos (ex.: comparação e fluxo de detalhe). 
+- Introduzir uma camada de persistência (Postgres/Redis) para casos que exijam dados duráveis e performance em escala.
+- Automatizar deploy de produção (CD) com validações e pipelines separados por ambiente.
 
----
+Se quiser, posso: gerar as capturas básicas, integrar Codecov no CI ou abrir um PR com essas alterações prontas — diga qual opção prefere.
 
 # Autor
 
