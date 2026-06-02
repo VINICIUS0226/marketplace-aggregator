@@ -4,9 +4,21 @@ services:
     build:
       context: ./backend
     container_name: marketplace-backend
-
     ports:
       - "3000:3000"
+
+    environment:
+      - PORT=3000
+
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
     restart: unless-stopped
 
@@ -15,11 +27,22 @@ services:
       context: ./frontend
 
     container_name: marketplace-frontend
-
     ports:
       - "5173:5173"
 
+    environment:
+      - VITE_API_URL=http://localhost:3000
+
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
 
     restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge
