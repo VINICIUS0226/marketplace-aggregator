@@ -49,6 +49,9 @@ Diferenciais implementados:
 - Pipeline de CI no GitHub Actions.
 - Cobertura agregada de backend e frontend publicada no Coveralls.
 - Lazy loading por rota para reduzir o bundle inicial do frontend.
+- Validação declarativa de entrada com Zod.
+- Retry com backoff antes do fallback para o último snapshot válido.
+- Logs estruturados em JSON e métricas operacionais da integração externa.
 
 ## Stack
 
@@ -59,6 +62,7 @@ Backend:
 - TypeScript
 - Axios
 - Node Cache
+- Zod
 - Swagger/OpenAPI
 - Jest e Supertest
 
@@ -121,7 +125,7 @@ GET /products
   -> DummyJSON em caso de cache miss
 ```
 
-O repository aplica timeout de 15 segundos na integração externa e normaliza o payload recebido antes de disponibilizá-lo às outras camadas.
+O repository aplica timeout de 15 segundos, três tentativas com backoff progressivo e normalização do payload recebido antes de disponibilizá-lo às outras camadas.
 
 ## Clonar o Repositório
 
@@ -157,6 +161,7 @@ Serviços:
 | Backend | http://localhost:3000 |
 | Swagger | http://localhost:3000/api-docs |
 | Health Check | http://localhost:3000/health |
+| Métricas | http://localhost:3000/metrics |
 
 Para parar:
 
@@ -244,6 +249,14 @@ Esse valor aponta para `localhost` porque a chamada é feita pelo browser do usu
 GET /health
 ```
 
+### Métricas Operacionais
+
+```http
+GET /metrics
+```
+
+Expõe contadores em memória para requisições, sucessos, falhas, retries e uso do snapshot stale da integração externa.
+
 ### Autenticação
 
 ```http
@@ -277,12 +290,12 @@ Query params:
 
 | Parâmetro | Tipo | Descrição |
 | --- | --- | --- |
-| page | number | Página atual |
-| limit | number | Itens por página |
+| page | number | Página atual, inteiro positivo |
+| limit | number | Itens por página, inteiro positivo entre 1 e 100 |
 | search | string | Busca textual por título, descrição ou categoria |
 | category | string | Filtro por categoria |
-| minPrice | number | Preço mínimo |
-| maxPrice | number | Preço máximo |
+| minPrice | number | Preço mínimo não negativo |
+| maxPrice | number | Preço máximo não negativo e maior ou igual ao mínimo |
 
 Exemplos:
 
@@ -318,6 +331,8 @@ Body:
   "ids": [1, 2, 3]
 }
 ```
+
+`ids` exige ao menos dois inteiros positivos e não permite duplicação.
 
 ### Atualizar Cache
 
@@ -375,10 +390,11 @@ docker compose up -d --build
 
 Resultados observados:
 
-- `25/25` testes automatizados do backend aprovados.
-- `8/8` testes unitários e de componente do frontend aprovados.
+- `32/32` testes automatizados do backend aprovados.
+- `15/15` testes unitários e de componente do frontend aprovados.
 - `6/6` testes E2E aprovados: listagem, detalhe, comparação, autenticação, fallback resiliente e geração das evidências visuais.
 - Build do frontend aprovado.
+- Cobertura mínima protegida por thresholds no Jest e Vitest.
 - Backend saudável via `GET /health`.
 - Frontend acessível em `http://localhost:5173`.
 - Pipeline do GitHub Actions aprovado em `master`.
@@ -411,12 +427,15 @@ O workflow em `.github/workflows/ci.yml` executa:
 ## Tratamento de Erros e Resiliência
 
 - Timeout configurado na chamada externa.
+- Três tentativas com backoff progressivo antes de recorrer ao fallback.
 - Cache em memória para reduzir chamadas repetidas à DummyJSON.
 - Fallback para o último snapshot válido quando a fonte externa falha após uma carga bem-sucedida.
 - E2E controlado para validar o fallback sem depender de indisponibilidade real da DummyJSON.
-- Validação mínima do payload recebido antes de atualizar o cache.
+- Validação do payload recebido antes de atualizar o cache.
+- Validação declarativa das entradas HTTP com Zod.
 - Middleware global de erro no backend.
 - Respostas padronizadas para erros conhecidos.
+- Logs estruturados em JSON e métricas operacionais expostas por `GET /metrics`.
 - Health check para o Docker Compose.
 - Rate limiting para reduzir abuso de requisições.
 - Helmet e CORS para proteções HTTP básicas.
@@ -431,7 +450,7 @@ Itens não implementados de propósito:
 - Deploy público.
 - Mensageria ou fila para ingestão assíncrona.
 
-Esses pontos aumentariam a complexidade sem serem necessários para cumprir o core do desafio. Em um cenário produtivo, os próximos passos seriam adicionar persistência, observabilidade, paginação delegada à fonte ou ao banco, e autenticação com usuários reais.
+Esses pontos aumentariam a complexidade sem serem necessários para cumprir o core do desafio. Em um cenário produtivo, os próximos passos seriam adicionar persistência, observabilidade distribuída, paginação delegada à fonte ou ao banco, e autenticação com usuários reais.
 
 ## Limitações Conhecidas
 
@@ -446,7 +465,7 @@ Esses pontos aumentariam a complexidade sem serem necessários para cumprir o co
 - Persistir produtos e histórico de preços em PostgreSQL ou SQLite.
 - Adicionar Redis para cache distribuído.
 - Criar deploy público.
-- Adicionar observabilidade com métricas, logs estruturados e tracing.
+- Exportar métricas para Prometheus e adicionar tracing distribuído.
 
 ## Evidências Visuais
 
