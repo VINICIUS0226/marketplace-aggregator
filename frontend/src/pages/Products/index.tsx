@@ -15,13 +15,13 @@ import {
   Chip,
 } from "@mui/material";
 
-import ClearAllIcon from '@mui/icons-material/ClearAll';
+import ClearAllIcon from "@mui/icons-material/ClearAll";
 import { useState } from "react";
 
 import { useProducts } from "../../hooks/useProducts";
-
 import { ProductCard } from "../../components/ProductCard";
 import { useCategories } from "../../hooks/useCategories";
+import type { Product } from "../../types/Product";
 
 export function Products() {
   const [search, setSearch] = useState("");
@@ -40,6 +40,10 @@ export function Products() {
 
   const { data: categories } = useCategories();
 
+  /**
+   * Ao limpar filtros, a paginação volta para o início para evitar consultar
+   * páginas inexistentes depois de uma mudança de critério.
+   */
   const clearFilters = () => {
     setSearch("");
     setCategory("");
@@ -54,8 +58,8 @@ export function Products() {
         Marketplace Aggregator
       </Typography>
 
-      <Paper sx={{ p: 3, mb: 4, borderRadius: 3, boxShadow: 2, border: '1px solid', borderColor: 'divider' }}>
-        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+      <Paper sx={{ p: 3, mb: 4, borderRadius: 3, boxShadow: 2, border: "1px solid", borderColor: "divider" }}>
+        <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: 2, justifyContent: "space-between", alignItems: "center", mb: 3 }}>
           <Box>
             <Typography variant="h6">Filtros</Typography>
             <Typography variant="body2" color="text.secondary">
@@ -67,7 +71,7 @@ export function Products() {
             variant="outlined"
             startIcon={<ClearAllIcon />}
             onClick={clearFilters}
-            sx={{ whiteSpace: 'nowrap' }}
+            sx={{ whiteSpace: "nowrap" }}
           >
             Limpar filtros
           </Button>
@@ -75,13 +79,13 @@ export function Products() {
 
         <Box
           sx={{
-            display: 'grid',
+            display: "grid",
             gap: 16,
-            alignItems: 'end',
+            alignItems: "end",
             gridTemplateColumns: {
-              xs: '1fr',
-              sm: '1.7fr 1fr',
-              md: '1.7fr 1fr 1fr 1fr',
+              xs: "1fr",
+              sm: "1.7fr 1fr",
+              md: "1.7fr 1fr 1fr 1fr",
             },
           }}
         >
@@ -90,8 +94,8 @@ export function Products() {
             label="Buscar produto"
             placeholder="Ex: smartphone, geladeira, tênis"
             value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
+            onChange={(event) => {
+              setSearch(event.target.value);
               setPage(1);
             }}
             size="small"
@@ -103,13 +107,13 @@ export function Products() {
               labelId="category-label"
               value={category}
               label="Categoria"
-              onChange={(e) => {
-                setCategory(e.target.value as string);
+              onChange={(event) => {
+                setCategory(event.target.value as string);
                 setPage(1);
               }}
             >
               <MenuItem value="">Todas</MenuItem>
-              {categories?.map((categoryItem: string) => (
+              {categories?.map((categoryItem) => (
                 <MenuItem key={categoryItem} value={categoryItem}>
                   {categoryItem}
                 </MenuItem>
@@ -123,8 +127,8 @@ export function Products() {
             label="Preço mínimo"
             placeholder="R$ 0"
             value={minPrice}
-            onChange={(e) => {
-              const value = e.target.value;
+            onChange={(event) => {
+              const value = event.target.value;
               setMinPrice(value === "" ? "" : Number(value));
               setPage(1);
             }}
@@ -137,8 +141,8 @@ export function Products() {
             label="Preço máximo"
             placeholder="R$ 0"
             value={maxPrice}
-            onChange={(e) => {
-              const value = e.target.value;
+            onChange={(event) => {
+              const value = event.target.value;
               setMaxPrice(value === "" ? "" : Number(value));
               setPage(1);
             }}
@@ -146,11 +150,11 @@ export function Products() {
           />
         </Box>
 
-        <Box sx={{ mt: 3, display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center' }}>
-          {search && <Chip label={`Busca: ${search}`} onDelete={() => setSearch('')} />}
-          {category && <Chip label={`Categoria: ${category}`} onDelete={() => setCategory('')} />}
-          {minPrice !== '' && <Chip label={`Mínimo: R$${minPrice}`} onDelete={() => setMinPrice('')} />}
-          {maxPrice !== '' && <Chip label={`Máximo: R$${maxPrice}`} onDelete={() => setMaxPrice('')} />}
+        <Box sx={{ mt: 3, display: "flex", flexWrap: "wrap", gap: 1, alignItems: "center" }}>
+          {search && <Chip label={`Busca: ${search}`} onDelete={() => setSearch("")} />}
+          {category && <Chip label={`Categoria: ${category}`} onDelete={() => setCategory("")} />}
+          {minPrice !== "" && <Chip label={`Mínimo: R$${minPrice}`} onDelete={() => setMinPrice("")} />}
+          {maxPrice !== "" && <Chip label={`Máximo: R$${maxPrice}`} onDelete={() => setMaxPrice("")} />}
         </Box>
       </Paper>
 
@@ -168,7 +172,7 @@ export function Products() {
           ))}
         </Grid>
       ) : data?.data.length === 0 ? (
-        <Box sx={{ mt: 4, textAlign: 'center' }}>
+        <Box sx={{ mt: 4, textAlign: "center" }}>
           <Typography variant="h6" color="text.secondary">
             Nenhum produto encontrado.
           </Typography>
@@ -176,7 +180,7 @@ export function Products() {
       ) : (
         <>
           <Grid container spacing={3}>
-            {data?.data?.map((product: any) => (
+            {data?.data?.map((product: Product) => (
               <Grid size={{ xs: 12, sm: 6, md: 3 }} key={product.id}>
                 <ProductCard product={product} />
               </Grid>
@@ -192,7 +196,7 @@ export function Products() {
           >
             <Pagination
               page={page}
-              count={data.totalPages}
+              count={data?.totalPages || 1}
               onChange={(_, value) => setPage(value)}
             />
           </Box>

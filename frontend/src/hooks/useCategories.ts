@@ -1,14 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../services/api";
 
+/**
+ * Carrega categorias disponíveis para popular o filtro da listagem.
+ */
 export function useCategories() {
-  return useQuery({
+  return useQuery<string[]>({
     queryKey: ["categories"],
 
     queryFn: async () => {
       const { data } =
-        await api.get(
-          "/products/categories"
+        await api.get<string[]>(
+          "/products/categories",
         );
 
       return data;

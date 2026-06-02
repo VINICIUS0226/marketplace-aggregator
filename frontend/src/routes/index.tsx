@@ -1,7 +1,7 @@
 import {
   BrowserRouter,
   Routes,
-  Route
+  Route,
 } from "react-router-dom";
 
 import { Products } from "../pages/Products";
@@ -10,6 +10,12 @@ import { Compare } from "../pages/Compare";
 import { NotFound } from "../pages/NotFound";
 import { CompareButton } from "../components/CompareButton";
 
+/**
+ * Define a navegação principal do marketplace.
+ *
+ * O botão de comparação fica fora das rotas para permanecer disponível durante
+ * a navegação, respeitando o estado global do CompareProvider.
+ */
 export function AppRoutes() {
   return (
     <BrowserRouter>
@@ -28,6 +34,7 @@ export function AppRoutes() {
           path="/compare"
           element={<Compare />}
         />
+
         <Route
           path="*"
           element={<NotFound />}

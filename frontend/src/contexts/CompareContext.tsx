@@ -1,32 +1,19 @@
 import {
-  createContext,
-  useContext,
   useState,
-  type ReactNode
+  type ReactNode,
 } from "react";
 
-interface Product {
-  id: number;
-  title: string;
-  price: number;
-  category: string;
-  thumbnail: string;
-  rating: number;
-  stock: number;
-}
+import type { Product } from "../types/Product";
+import { CompareContext } from "./compareStore";
 
-interface CompareContextData {
-  selectedProducts: Product[];
-  addProduct: (product: Product) => void;
-  removeProduct: (id: number) => void;
-  clearProducts: () => void;
-}
-
-const CompareContext =
-  createContext({} as CompareContextData);
-
+/**
+ * Estado global mínimo para a comparação.
+ *
+ * Context API é suficiente aqui porque o estado é pequeno, local ao frontend e
+ * não exige uma solução mais pesada como Redux/Zustand.
+ */
 export function CompareProvider({
-  children
+  children,
 }: {
   children: ReactNode;
 }) {
@@ -34,22 +21,21 @@ export function CompareProvider({
     useState<Product[]>([]);
 
   function addProduct(product: Product) {
-    const exists =
-      selectedProducts.find(
-        p => p.id === product.id
-      );
+    const exists = selectedProducts.find(
+      (selectedProduct) => selectedProduct.id === product.id,
+    );
 
     if (exists) return;
 
-    setSelectedProducts(prev => [
-      ...prev,
-      product
+    setSelectedProducts((currentProducts) => [
+      ...currentProducts,
+      product,
     ]);
   }
 
   function removeProduct(id: number) {
-    setSelectedProducts(prev =>
-      prev.filter(p => p.id !== id)
+    setSelectedProducts((currentProducts) =>
+      currentProducts.filter((product) => product.id !== id),
     );
   }
 
@@ -69,8 +55,4 @@ export function CompareProvider({
       {children}
     </CompareContext.Provider>
   );
-}
-
-export function useCompare() {
-  return useContext(CompareContext);
 }

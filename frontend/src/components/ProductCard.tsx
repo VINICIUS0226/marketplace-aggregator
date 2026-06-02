@@ -12,10 +12,11 @@ import {
 } from "@mui/material";
 
 import { Link } from "react-router-dom";
-import { useCompare } from "../contexts/CompareContext";
+import { useCompare } from "../contexts/compareStore";
+import type { Product } from "../types/Product";
 
 interface Props {
-  product: any;
+  product: Product;
 }
 
 export function ProductCard({ product }: Props) {
@@ -23,6 +24,10 @@ export function ProductCard({ product }: Props) {
 
   const checked = selectedProducts.some((p) => p.id === product.id);
 
+  /**
+   * O card inteiro navega para detalhes, enquanto o checkbox mantém a ação de
+   * comparação acessível diretamente na listagem.
+   */
   return (
     <Card
       sx={{
@@ -32,23 +37,23 @@ export function ProductCard({ product }: Props) {
         justifyContent: "space-between",
         boxShadow: 3,
         transition: "transform 0.15s ease-in-out",
-        '&:hover': { transform: "translateY(-6px)" },
+        "&:hover": { transform: "translateY(-6px)" },
       }}
     >
       <CardActionArea
         component={Link}
         to={`/products/${product.id}`}
-        sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, alignItems: 'stretch' }}
+        sx={{ display: "flex", flexDirection: "column", flexGrow: 1, alignItems: "stretch" }}
       >
         <CardMedia
           component="img"
           height="220"
           image={product.thumbnail}
           alt={product.title}
-          sx={{ objectFit: 'cover' }}
+          sx={{ objectFit: "cover" }}
         />
 
-        <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        <CardContent sx={{ flexGrow: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
           <Box>
             <Typography variant="h6" gutterBottom sx={{ fontWeight: 700 }}>
               {product.title}
@@ -58,10 +63,10 @@ export function ProductCard({ product }: Props) {
               variant="body2"
               color="text.secondary"
               sx={{
-                display: '-webkit-box',
+                display: "-webkit-box",
                 WebkitLineClamp: 2,
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
+                WebkitBoxOrient: "vertical",
+                overflow: "hidden",
               }}
             >
               {product.description || ""}
@@ -78,7 +83,7 @@ export function ProductCard({ product }: Props) {
       </CardActionArea>
 
       <CardActions sx={{ px: 2, pb: 2, pt: 0 }}>
-        <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Box sx={{ width: "100%", display: "flex", alignItems: "center", gap: 1 }}>
           <Checkbox
             checked={checked}
             onChange={(event) => {
