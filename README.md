@@ -368,12 +368,13 @@ docker compose up -d --build
 
 Resultados observados:
 
-- Testes automatizados do backend aprovados.
-- Teste de componente do frontend aprovado.
-- Testes E2E de listagem e navegação para detalhe aprovados.
+- `25/25` testes automatizados do backend aprovados.
+- `8/8` testes unitários e de componente do frontend aprovados.
+- `5/5` testes E2E aprovados: listagem, detalhe, comparação, autenticação e geração das evidências visuais.
 - Build do frontend aprovado.
 - Backend saudável via `GET /health`.
 - Frontend acessível em `http://localhost:5173`.
+- Pipeline do GitHub Actions aprovado em `master`.
 
 ## CI
 
@@ -437,10 +438,10 @@ Esses pontos aumentariam a complexidade sem serem necessários para cumprir o co
 
 - Persistir produtos e histórico de preços em PostgreSQL ou SQLite.
 - Adicionar Redis para cache distribuído.
-- Melhorar cobertura E2E para comparação e autenticação.
+- Ampliar cobertura E2E para cenários de indisponibilidade externa.
 - Criar deploy público.
 - Publicar badge real de coverage via Codecov ou Coveralls.
-- Adicionar screenshots em `docs/` para evidenciar Swagger, listagem, detalhe e comparação.
+- Otimizar o bundle do frontend com lazy loading por rota.
 
 ## Evidências Visuais
 

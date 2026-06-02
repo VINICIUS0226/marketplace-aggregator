@@ -1,12 +1,17 @@
 # Evidências do Projeto
 
-Este diretório deve receber as capturas de tela usadas no README.
+Este diretório contém capturas reais usadas no README principal para facilitar a avaliação visual da entrega:
 
-Capturas sugeridas:
+- `products.png`: listagem com filtros.
+- `product-detail.png`: detalhe e histórico sintético de preços.
+- `comparison.png`: comparação lado a lado.
+- `swagger.png`: documentação Swagger da API.
 
-- `swagger.png` — documentação Swagger em `http://localhost:3000/api-docs`
-- `products.png` — lista de produtos na interface principal
-- `product-detail.png` — página de detalhes de um produto
-- `comparison.png` — comparação de dois ou mais produtos
+As imagens podem ser regeneradas executando:
 
-Quando disponíveis, elas ajudam a demonstrar a entrega visual do projeto e o funcionamento das principais telas.
+```bash
+cd frontend
+npm run test:e2e
+```
+
+O cenário `e2e/evidence.spec.ts` percorre as telas e atualiza as capturas.
