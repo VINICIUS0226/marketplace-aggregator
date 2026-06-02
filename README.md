@@ -164,6 +164,7 @@ Serviços:
 | Swagger | http://localhost:3000/api-docs |
 | Health Check | http://localhost:3000/health |
 | Métricas | http://localhost:3000/metrics |
+| Métricas Prometheus | http://localhost:3000/metrics/prometheus |
 
 Para parar:
 
@@ -272,6 +273,16 @@ GET /metrics
 ```
 
 Expõe contadores em memória para requisições, sucessos, falhas, retries e uso do snapshot stale da integração externa.
+
+### Métricas Prometheus
+
+```http
+GET /metrics/prometheus
+```
+
+Expõe os contadores da integração e métricas HTTP agregadas no formato texto
+aceito pelo Prometheus. As respostas HTTP também propagam `x-correlation-id` e
+`traceparent`, permitindo correlacionar requisições nos logs estruturados.
 
 ### Autenticação
 
@@ -407,7 +418,7 @@ docker compose up -d --build
 
 Resultados observados:
 
-- `35/35` testes automatizados do backend aprovados.
+- `37/37` testes automatizados do backend aprovados.
 - `20/20` testes unitários e de componente do frontend aprovados.
 - `7/7` testes E2E aprovados: listagem, detalhe, comparação desktop e mobile, autenticação, fallback resiliente e geração das evidências visuais.
 - Build do frontend aprovado.
@@ -449,11 +460,12 @@ O workflow em `.github/workflows/ci.yml` executa:
 - Single-flight para evitar cargas externas duplicadas enquanto o cache ainda está frio.
 - Fallback para o último snapshot válido quando a fonte externa falha após uma carga bem-sucedida.
 - E2E controlado para validar o fallback sem depender de indisponibilidade real da DummyJSON.
-- Validação do payload recebido antes de atualizar o cache.
+- Validação declarativa com Zod do payload externo antes de atualizar o cache.
 - Validação declarativa das entradas HTTP com Zod.
 - Middleware global de erro no backend.
 - Respostas padronizadas para erros conhecidos.
-- Logs estruturados em JSON e métricas operacionais expostas por `GET /metrics`.
+- Logs estruturados em JSON com correlation ID e spans HTTP propagáveis por W3C Trace Context.
+- Métricas operacionais em JSON e formato Prometheus expostas por `GET /metrics` e `GET /metrics/prometheus`.
 - Health check para o Docker Compose.
 - Rate limiting para reduzir abuso de requisições.
 - Helmet e CORS para proteções HTTP básicas.
@@ -468,7 +480,7 @@ Itens não implementados de propósito:
 - Deploy público.
 - Mensageria ou fila para ingestão assíncrona.
 
-Esses pontos aumentariam a complexidade sem serem necessários para cumprir o core do desafio. Em um cenário produtivo, os próximos passos seriam adicionar persistência, observabilidade distribuída, paginação delegada à fonte ou ao banco, e autenticação com usuários reais.
+Esses pontos aumentariam a complexidade sem serem necessários para cumprir o core do desafio. Em um cenário produtivo, os próximos passos seriam adicionar persistência, exportação de traces para um backend de observabilidade, paginação delegada à fonte ou ao banco, e autenticação com usuários reais.
 
 ## Limitações Conhecidas
 
@@ -477,13 +489,14 @@ Esses pontos aumentariam a complexidade sem serem necessários para cumprir o co
 - As credenciais de demonstração são fixas e existem apenas para evidenciar proteção de rota.
 - O histórico de preços não é persistido entre reinicializações.
 - A comparação é mantida no estado do browser e não sobrevive a refresh da página.
+- As métricas são locais ao processo e os traces HTTP são registrados nos logs, sem exportador OpenTelemetry.
 
 ## Próximos Passos
 
 - Persistir produtos e histórico de preços em PostgreSQL ou SQLite.
 - Adicionar Redis para cache distribuído.
 - Criar deploy público.
-- Exportar métricas para Prometheus, adicionar correlation IDs e tracing distribuído.
+- Integrar OpenTelemetry a um backend de traces e criar dashboards Grafana para as métricas Prometheus.
 
 ## Evidências Visuais
 
@@ -498,6 +511,10 @@ Esses pontos aumentariam a complexidade sem serem necessários para cumprir o co
 ### Comparação de Produtos
 
 ![Comparação de produtos](docs/comparison.png)
+
+### Comparação em Dispositivo Móvel
+
+![Comparação de produtos em dispositivo móvel](docs/comparison-mobile.png)
 
 ### Swagger
 

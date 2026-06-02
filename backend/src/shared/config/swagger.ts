@@ -138,12 +138,50 @@ const options: swaggerJsdoc.Options = {
           },
         },
 
+        HealthResponse: {
+          type: "object",
+          properties: {
+            status: { type: "string", example: "ok" },
+            timestamp: {
+              type: "string",
+              format: "date-time",
+              example: "2026-06-02T15:00:00.000Z",
+            },
+            uptime: { type: "number", example: 120.5 },
+          },
+        },
+
+        ValidationIssue: {
+          type: "object",
+          properties: {
+            path: {
+              type: "string",
+              example: "limit",
+            },
+            message: {
+              type: "string",
+              example: "Too big: expected number to be <=50",
+            },
+          },
+        },
+
         ErrorResponse: {
           type: "object",
           properties: {
+            success: {
+              type: "boolean",
+              example: false,
+            },
             message: {
               type: "string",
               example: "Product not found",
+            },
+            issues: {
+              type: "array",
+              description: "Detalhes opcionais retornados para erros de validacao Zod.",
+              items: {
+                $ref: "#/components/schemas/ValidationIssue",
+              },
             },
           },
         },

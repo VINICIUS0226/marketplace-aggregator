@@ -6,6 +6,10 @@ import {
   incrementMetric,
 } from "../../../shared/config/metrics";
 import { logger } from "../../../shared/utils/logger";
+import {
+  externalProductsResponseSchema,
+  ExternalProduct,
+} from "../schemas/externalProductSchemas";
 
 /**
  * URL da fonte externa escolhida para o case.
@@ -28,26 +32,6 @@ function wait(milliseconds: number) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
-function isExternalProduct(product: unknown): product is Product {
-  if (!product || typeof product !== "object") {
-    return false;
-  }
-
-  const candidate = product as Partial<Product>;
-
-  return (
-    typeof candidate.id === "number" &&
-    typeof candidate.title === "string" &&
-    typeof candidate.description === "string" &&
-    typeof candidate.category === "string" &&
-    typeof candidate.price === "number" &&
-    typeof candidate.rating === "number" &&
-    typeof candidate.stock === "number" &&
-    typeof candidate.thumbnail === "string" &&
-    Array.isArray(candidate.images)
-  );
-}
-
 /**
  * Repository responsável pela integração com a fonte externa de produtos.
  *
@@ -62,7 +46,7 @@ export class ProductRepository {
    * Cria um histórico sintético de preço para demonstrar o diferencial pedido
    * no case sem introduzir persistência fora do escopo obrigatório.
    */
-  private buildPriceHistory(product: Product) {
+  private buildPriceHistory(product: Pick<Product, "price">) {
     const historyDays = 5;
     const today = new Date();
 
@@ -135,15 +119,16 @@ export class ProductRepository {
           timeout: 15000,
         });
 
-        if (
-          !Array.isArray(response.data?.products) ||
-          !response.data.products.every(isExternalProduct)
-        ) {
+        const parsedResponse = externalProductsResponseSchema.safeParse(
+          response.data,
+        );
+
+        if (!parsedResponse.success) {
           throw new Error("External provider returned an invalid payload.");
         }
 
-        const products: Product[] = response.data.products.map(
-          (product: Product) => ({
+        const products: Product[] = parsedResponse.data.products.map(
+          (product: ExternalProduct) => ({
             ...product,
             priceHistory: this.buildPriceHistory(product),
           }),

@@ -46,6 +46,19 @@ describe('Products API', () => {
     expect(response.body).toHaveProperty('uptime');
   });
 
+  it('should propagate correlation and W3C trace identifiers', async () => {
+    const traceId = 'a'.repeat(32);
+    const response = await request(app)
+      .get('/health')
+      .set('x-correlation-id', 'case-evaluation')
+      .set('traceparent', `00-${traceId}-${'b'.repeat(16)}-01`);
+
+    expect(response.headers['x-correlation-id']).toBe('case-evaluation');
+    expect(response.headers.traceparent).toMatch(
+      new RegExp(`^00-${traceId}-[a-f0-9]{16}-01$`),
+    );
+  });
+
   it('should list products with pagination', async () => {
     const response = await request(app).get('/products?page=1&limit=1');
 
@@ -228,5 +241,17 @@ describe('Products API', () => {
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty('externalProviderRequests');
     expect(response.body).toHaveProperty('staleCacheFallbacks');
+  });
+
+  it('should expose Prometheus metrics', async () => {
+    const response = await request(app).get('/metrics/prometheus');
+
+    expect(response.status).toBe(200);
+    expect(response.headers['content-type']).toContain('text/plain');
+    expect(response.text).toContain(
+      '# TYPE marketplace_external_provider_requests_total counter',
+    );
+    expect(response.text).toContain('marketplace_http_requests_total');
+    expect(response.text).toContain('path="/products/:id"');
   });
 });

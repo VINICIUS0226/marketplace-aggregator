@@ -16,8 +16,12 @@ import productRoutes from "./modules/products/routes/productRoutes";
 
 import { errorHandler } from "./shared/middlewares/errorHandler";
 import { swaggerSpec } from "./shared/config/swagger";
-import { getMetricsSnapshot } from "./shared/config/metrics";
+import {
+  getMetricsSnapshot,
+  getPrometheusMetrics,
+} from "./shared/config/metrics";
 import { logger } from "./shared/utils/logger";
+import { observabilityMiddleware } from "./shared/middlewares/observability";
 
 dotenv.config();
 
@@ -55,6 +59,7 @@ app.use(
   }),
 );
 app.use(helmet());
+app.use(observabilityMiddleware);
 app.use(
   morgan("combined", {
     stream: {
@@ -84,6 +89,20 @@ app.use(
 
 /**
  * Health check usado pelo Docker Compose e por validações manuais.
+ */
+/**
+ * @swagger
+ * /health:
+ *   get:
+ *     summary: Consulta a saude da aplicacao
+ *     tags: [Operations]
+ *     responses:
+ *       200:
+ *         description: Aplicacao pronta para receber requisicoes.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/HealthResponse"
  */
 app.get(
   "/health",
@@ -118,6 +137,31 @@ app.get(
   "/metrics",
   (_request: Request, response: Response) => {
     return response.status(200).json(getMetricsSnapshot());
+  },
+);
+
+/**
+ * @swagger
+ * /metrics/prometheus:
+ *   get:
+ *     summary: Exporta metricas no formato Prometheus
+ *     description: Retorna contadores de integracao e metricas HTTP para coleta por scraping.
+ *     tags: [Operations]
+ *     responses:
+ *       200:
+ *         description: Metricas exportadas no formato de texto do Prometheus.
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ */
+app.get(
+  "/metrics/prometheus",
+  (_request: Request, response: Response) => {
+    return response
+      .status(200)
+      .type("text/plain")
+      .send(getPrometheusMetrics());
   },
 );
 

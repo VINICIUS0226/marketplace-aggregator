@@ -31,7 +31,10 @@ test('captures project evidence screenshots', async ({ page }) => {
   await expect(page.getByText('Product Comparison')).toBeVisible();
   await waitForLoadedImages(page);
   await page.screenshot({ path: '../docs/comparison.png', fullPage: true });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.screenshot({ path: '../docs/comparison-mobile.png', fullPage: true });
 
+  await page.setViewportSize({ width: 1280, height: 720 });
   await page.goto('http://127.0.0.1:3000/api-docs');
   await expect(page.locator('section.swagger-ui')).toBeVisible();
   await page.screenshot({ path: '../docs/swagger.png', fullPage: true });

@@ -21,5 +21,6 @@ app.listen(PORT, () => {
     swaggerUrl: `http://localhost:${PORT}/api-docs`,
     healthUrl: `http://localhost:${PORT}/health`,
     metricsUrl: `http://localhost:${PORT}/metrics`,
+    prometheusMetricsUrl: `http://localhost:${PORT}/metrics/prometheus`,
   });
 });

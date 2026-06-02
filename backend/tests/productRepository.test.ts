@@ -113,7 +113,11 @@ describe('ProductRepository', () => {
   });
 
   it('rejects invalid external payloads when no snapshot is available', async () => {
-    mockedAxios.get.mockResolvedValueOnce({ data: { products: [{ id: 1 }] } });
+    mockedAxios.get.mockResolvedValue({
+      data: {
+        products: [{ ...exampleProducts[0], images: [123] }],
+      },
+    });
 
     const repository = new ProductRepository();
 
