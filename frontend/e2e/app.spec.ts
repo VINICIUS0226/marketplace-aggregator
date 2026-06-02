@@ -37,3 +37,33 @@ test('should compare two selected products', async ({ page }) => {
   await expect(page.getByText('Preço')).toBeVisible();
   await expect(page.getByText('Estoque')).toBeVisible();
 });
+
+test('should protect cache refresh with JWT authentication', async ({ request }) => {
+  const unauthorizedResponse = await request.post(
+    'http://127.0.0.1:3000/products/refresh-cache',
+  );
+  expect(unauthorizedResponse.status()).toBe(401);
+
+  const loginResponse = await request.post(
+    'http://127.0.0.1:3000/auth/login',
+    {
+      data: {
+        username: 'admin',
+        password: 'admin123',
+      },
+    },
+  );
+  expect(loginResponse.ok()).toBeTruthy();
+
+  const { token } = await loginResponse.json();
+  const refreshResponse = await request.post(
+    'http://127.0.0.1:3000/products/refresh-cache',
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
+  expect(refreshResponse.ok()).toBeTruthy();
+});

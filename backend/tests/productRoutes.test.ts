@@ -95,6 +95,15 @@ describe('Products API', () => {
     expect(response.body).toHaveProperty('message');
   });
 
+  it('should return 400 when compare receives only one product', async () => {
+    const response = await request(app)
+      .post('/products/compare')
+      .send({ ids: [1] });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty('message');
+  });
+
   it('should return 400 when compare ids contains a non-numeric value', async () => {
     const response = await request(app)
       .post('/products/compare')

@@ -55,4 +55,46 @@ describe("ProductDetail page", () => {
     );
     expect(addProduct).toHaveBeenCalledTimes(1);
   });
+
+  it("removes a product already selected for comparison", async () => {
+    const removeProduct = vi.fn();
+    const user = userEvent.setup();
+    const product = {
+      id: 1,
+      title: "Notebook Pro",
+      description: "High performance notebook",
+      category: "notebooks",
+      price: 4999,
+      rating: 4.8,
+      stock: 7,
+      thumbnail: "notebook.png",
+      images: ["notebook.png"],
+      priceHistory: [],
+    };
+
+    vi.mocked(useProduct).mockReturnValue({
+      data: product,
+      isLoading: false,
+      error: null,
+    } as ReturnType<typeof useProduct>);
+
+    vi.mocked(useCompare).mockReturnValue({
+      selectedProducts: [product],
+      addProduct: vi.fn(),
+      removeProduct,
+      clearProducts: vi.fn(),
+    });
+
+    render(
+      <MemoryRouter>
+        <ProductDetail />
+      </MemoryRouter>,
+    );
+
+    await user.click(
+      screen.getByRole("button", { name: "Remover da Comparação" }),
+    );
+
+    expect(removeProduct).toHaveBeenCalledWith(product.id);
+  });
 });
