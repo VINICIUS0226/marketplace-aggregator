@@ -9,6 +9,7 @@ Solução fullstack para o Case Técnico de Desenvolvedor(a) Fullstack Sênior d
 ![Docker](https://img.shields.io/badge/Docker-Enabled-blue)
 ![Swagger](https://img.shields.io/badge/Swagger-OpenAPI-green)
 ![CI](https://github.com/VINICIUS0226/marketplace-aggregator/actions/workflows/ci.yml/badge.svg)
+[![codecov](https://codecov.io/gh/VINICIUS0226/marketplace-aggregator/branch/master/graph/badge.svg)](https://codecov.io/gh/VINICIUS0226/marketplace-aggregator)
 
 ## Visão Geral
 
@@ -46,6 +47,8 @@ Diferenciais implementados:
 - Documentação Swagger/OpenAPI.
 - Testes E2E com Playwright.
 - Pipeline de CI no GitHub Actions.
+- Cobertura publicada no Codecov com autenticação OIDC.
+- Lazy loading por rota para reduzir o bundle inicial do frontend.
 
 ## Stack
 
@@ -210,10 +213,14 @@ Backend:
 PORT=3000
 AUTH_SECRET=marketplace-secret
 CORS_ORIGINS=http://localhost
+PRODUCTS_API_URL=https://dummyjson.com/products?limit=100
 ```
 
 `CORS_ORIGINS` é opcional e aceita uma lista separada por vírgulas para
 ambientes adicionais.
+
+`PRODUCTS_API_URL` também é opcional. Ela permite substituir a DummyJSON sem
+alterar código e é usada pelo E2E de resiliência com uma fonte controlada.
 
 Frontend:
 
@@ -370,7 +377,7 @@ Resultados observados:
 
 - `25/25` testes automatizados do backend aprovados.
 - `8/8` testes unitários e de componente do frontend aprovados.
-- `5/5` testes E2E aprovados: listagem, detalhe, comparação, autenticação e geração das evidências visuais.
+- `6/6` testes E2E aprovados: listagem, detalhe, comparação, autenticação, fallback resiliente e geração das evidências visuais.
 - Build do frontend aprovado.
 - Backend saudável via `GET /health`.
 - Frontend acessível em `http://localhost:5173`.
@@ -388,7 +395,7 @@ O workflow em `.github/workflows/ci.yml` executa:
 - Testes E2E.
 - Build do frontend.
 - Upload dos relatórios de coverage como artefatos.
-- Upload opcional para Codecov quando `CODECOV_TOKEN` estiver configurado.
+- Upload dos relatórios para Codecov autenticado por OIDC, sem segredo persistido.
 
 ## Decisões de Arquitetura
 
@@ -406,6 +413,7 @@ O workflow em `.github/workflows/ci.yml` executa:
 - Timeout configurado na chamada externa.
 - Cache em memória para reduzir chamadas repetidas à DummyJSON.
 - Fallback para o último snapshot válido quando a fonte externa falha após uma carga bem-sucedida.
+- E2E controlado para validar o fallback sem depender de indisponibilidade real da DummyJSON.
 - Validação mínima do payload recebido antes de atualizar o cache.
 - Middleware global de erro no backend.
 - Respostas padronizadas para erros conhecidos.
@@ -432,16 +440,13 @@ Esses pontos aumentariam a complexidade sem serem necessários para cumprir o co
 - As credenciais de demonstração são fixas e existem apenas para evidenciar proteção de rota.
 - O histórico de preços não é persistido entre reinicializações.
 - A comparação é mantida no estado do browser e não sobrevive a refresh da página.
-- O bundle do frontend ainda pode ser otimizado com lazy loading por rota.
 
 ## Próximos Passos
 
 - Persistir produtos e histórico de preços em PostgreSQL ou SQLite.
 - Adicionar Redis para cache distribuído.
-- Ampliar cobertura E2E para cenários de indisponibilidade externa.
 - Criar deploy público.
-- Publicar badge real de coverage via Codecov ou Coveralls.
-- Otimizar o bundle do frontend com lazy loading por rota.
+- Adicionar observabilidade com métricas, logs estruturados e tracing.
 
 ## Evidências Visuais
 

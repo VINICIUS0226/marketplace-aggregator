@@ -8,11 +8,13 @@ on:
     branches:
       - master
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   backend:
     runs-on: ubuntu-latest
-    env:
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     defaults:
       run:
         working-directory: backend
@@ -31,16 +33,16 @@ jobs:
           path: backend/coverage
 
       - name: Upload backend coverage to Codecov
-        if: ${{ env.CODECOV_TOKEN != '' }}
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v6
         with:
+          disable_search: true
+          fail_ci_if_error: true
           files: ./backend/coverage/lcov.info
-          token: ${{ env.CODECOV_TOKEN }}
+          flags: backend
+          use_oidc: true
 
   frontend:
     runs-on: ubuntu-latest
-    env:
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     defaults:
       run:
         working-directory: frontend
@@ -74,10 +76,12 @@ jobs:
           path: frontend/coverage
 
       - name: Upload frontend coverage to Codecov
-        if: ${{ env.CODECOV_TOKEN != '' }}
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v6
         with:
+          disable_search: true
+          fail_ci_if_error: true
           files: ./frontend/coverage/lcov.info
-          token: ${{ env.CODECOV_TOKEN }}
+          flags: frontend
+          use_oidc: true
 
       - run: npm run build
