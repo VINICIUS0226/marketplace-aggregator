@@ -63,7 +63,7 @@ describe("Compare page", () => {
 
     expect(screen.getByText("Notebook Pro")).toBeInTheDocument();
     expect(screen.getByText("Notebook Air")).toBeInTheDocument();
-    expect(screen.getByText("R$ 4999")).toBeInTheDocument();
-    expect(screen.getByText("R$ 3999")).toBeInTheDocument();
+    expect(screen.getByText("R$ 4.999,00")).toBeInTheDocument();
+    expect(screen.getByText("R$ 3.999,00")).toBeInTheDocument();
   });
 });

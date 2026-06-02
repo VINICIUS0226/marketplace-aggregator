@@ -48,7 +48,10 @@ describe("ProductDetail page", () => {
 
     expect(screen.getByText("Notebook Pro")).toBeInTheDocument();
     expect(screen.getByText("Histórico de preços")).toBeInTheDocument();
-    expect(screen.getByText("R$ 4899")).toBeInTheDocument();
+    expect(screen.getByText("R$ 4.899,00")).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Compra indisponível" }),
+    ).toBeDisabled();
 
     await user.click(
       screen.getByRole("button", { name: "Adicionar à Comparação" }),

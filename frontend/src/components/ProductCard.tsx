@@ -14,6 +14,7 @@ import {
 import { Link } from "react-router-dom";
 import { useCompare } from "../contexts/compareStore";
 import type { Product } from "../types/Product";
+import { formatCurrency } from "../utils/currency";
 
 interface Props {
   product: Product;
@@ -76,7 +77,7 @@ export function ProductCard({ product }: Props) {
           <Box sx={{ mt: 2, display: "flex", gap: 1, alignItems: "center" }}>
             <Chip label={product.category} size="small" />
             <Typography variant="h6" color="primary" sx={{ ml: "auto", fontWeight: 700 }}>
-              R$ {product.price}
+              {formatCurrency(product.price)}
             </Typography>
           </Box>
         </CardContent>

@@ -15,6 +15,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 import { useNavigate } from "react-router-dom";
 import { useCompare } from "../../contexts/compareStore";
+import { formatCurrency } from "../../utils/currency";
 
 export function Compare() {
   const { selectedProducts } = useCompare();
@@ -96,7 +97,7 @@ export function Compare() {
                 {selectedProducts.map((product) => (
                   <TableCell key={product.id} sx={{ textAlign: "center", py: 2 }}>
                     <Typography variant="body1" sx={{ fontWeight: 700 }}>
-                      R$ {product.price}
+                      {formatCurrency(product.price)}
                     </Typography>
                   </TableCell>
                 ))}

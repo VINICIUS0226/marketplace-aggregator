@@ -11,6 +11,12 @@ export default defineConfig({
     exclude: ['e2e/**'],
     coverage: {
       reporter: ['text', 'html', 'clover', 'json', 'lcov'],
+      thresholds: {
+        statements: 70,
+        branches: 70,
+        functions: 65,
+        lines: 70,
+      },
     },
   },
 })

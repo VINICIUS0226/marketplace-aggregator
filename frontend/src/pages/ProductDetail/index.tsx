@@ -21,6 +21,7 @@ import { useState } from "react";
 
 import { useProduct } from "../../hooks/useProduct";
 import { useCompare } from "../../contexts/compareStore";
+import { formatCurrency } from "../../utils/currency";
 
 export function ProductDetail() {
   const { id } = useParams();
@@ -102,7 +103,7 @@ export function ProductDetail() {
             </Stack>
 
             <Typography variant="h5" color="primary" sx={{ mb: 2 }}>
-              R$ {data.price}
+              {formatCurrency(data.price)}
             </Typography>
 
             <Typography sx={{ mb: 3, color: "text.secondary" }}>
@@ -110,7 +111,9 @@ export function ProductDetail() {
             </Typography>
 
             <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-              <Button variant="contained" size="large">Comprar</Button>
+              <Button variant="contained" size="large" disabled>
+                Compra indisponível
+              </Button>
               <Button
                 variant={productIsSelected ? "contained" : "outlined"}
                 size="large"
@@ -153,7 +156,7 @@ export function ProductDetail() {
                   {item.date}
                 </Typography>
                 <Typography variant="body1" sx={{ fontWeight: 700 }}>
-                  R$ {item.price}
+                  {formatCurrency(item.price)}
                 </Typography>
               </Box>
             ))}
