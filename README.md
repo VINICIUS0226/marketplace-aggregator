@@ -212,6 +212,8 @@ acessado apenas por `http://localhost`, sem informar uma porta.
 
 ## Como Rodar Localmente
 
+> Aviso para o frontend local: o Vite exige Node.js 20.19 ou superior, ou Node.js 22.12 ou superior. Com Node.js 20.14.0, o `npm run dev` falha por versao incompativel. Se tambem aparecer erro de binding nativo do `rolldown`, atualize o Node, remova `node_modules` do frontend e rode `npm ci` novamente.
+
 Backend:
 
 ```bash
